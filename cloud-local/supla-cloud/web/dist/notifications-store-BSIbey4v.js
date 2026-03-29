@@ -1,0 +1,1 @@
+import{x as n,ab as r,aa as c,ac as u}from"./index-DzjYg98v.js";const f={async getList(){const{body:t}=await n.get("notifications");return t}},d=c("notifications",()=>{const{all:t,ids:s,list:i,ready:o,$reset:a,fetchAll:e}=u(f);return{all:t,ids:s,list:i,ready:o,$reset:a,fetchAll:e}});function p(t){const{store:s}=r(d(),t);return s}export{p as a,d as u};

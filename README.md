@@ -39,6 +39,7 @@ W katalogach z konfiguracją zostają wyłącznie bezpieczne przykłady, pliki s
 
 Najczęstsze ścieżki:
 
-1. `private-mqtt/README.md` dla samodzielnego deploymentu z własnym brokerem.
-2. `supla-docker/README.md` oraz `supla-docker/docs/mqtt-private-broker.md` dla forka opartego o oficjalny stack.
-3. `supla-core/README.md` dla kodu serwera i komponentów core.
+1. `docs/instalacja-serwera-supla.md` dla pełnej instrukcji instalacji krok po kroku.
+2. `private-mqtt/README.md` dla samodzielnego deploymentu z własnym brokerem.
+3. `supla-docker/README.md` oraz `supla-docker/docs/mqtt-private-broker.md` dla forka opartego o oficjalny stack.
+4. `supla-core/README.md` dla kodu serwera i komponentów core.

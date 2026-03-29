@@ -5,6 +5,10 @@ services:
     image: supla/supla-cloud:${SUPLA_CLOUD_VERSION:-latest}
     env_file:
       - .env
+    environment:
+      MQTT_BROKER_PROTOCOL: mqtts
+      MQTT_BROKER_PORT: 8883
+      MQTT_BROKER_TLS: true
     volumes:
       - ./ssl/cloud:/etc/apache2/ssl
       - ${VOLUME_DATA}/cloud-local:/var/www/cloud/var/local
@@ -44,9 +48,12 @@ services:
     image: supla/supla-server:${SUPLA_SERVER_VERSION:-latest}
     env_file:
       - .env
+    environment:
+      MQTT_BROKER_PROTOCOL: mqtts
+      MQTT_BROKER_PORT: 8883
+      MQTT_BROKER_TLS: true
     volumes:
       - ./ssl/server:/etc/supla-server/ssl
-      - ./config/supla-server/supla-tls.cfg:/etc/supla-server/supla.cfg:ro
       - supla-server-socket:/var/run/supla
     ports:
       - "2015:2015"

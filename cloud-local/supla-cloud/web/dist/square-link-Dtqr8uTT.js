@@ -1,0 +1,1 @@
+import{_ as o,c as n,o as r,X as t}from"./index-DzjYg98v.js";const a={};function c(e,s,i,l,p,$){return r(),n("div",{class:"square-link",onClick:s[0]||(s[0]=d=>e.$emit("click"))},[t(e.$slots,"default")])}const k=o(a,[["render",c]]);export{k as S};

@@ -1,0 +1,13 @@
+services:
+  supla-cloud:
+    environment:
+      ACCOUNT_LIMITS_SELF_UPDATE_ENABLED: ${ACCOUNT_LIMITS_SELF_UPDATE_ENABLED:-false}
+    volumes:
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/UserController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/UserController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/DependencyInjection/Configuration.php:/var/www/cloud/src/SuplaBundle/DependencyInjection/Configuration.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/DependencyInjection/SuplaExtension.php:/var/www/cloud/src/SuplaBundle/DependencyInjection/SuplaExtension.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Twig/FrontendConfig.php:/var/www/cloud/src/SuplaBundle/Twig/FrontendConfig.php:ro
+      - ../cloud-local/supla-cloud/app/config/services/services.yml:/var/www/cloud/app/config/services/services.yml:ro
+      - ../cloud-local/supla-cloud/web/index.html:/var/www/cloud/web/index.html:ro
+      - ../cloud-local/supla-cloud/web/dist:/var/www/cloud/web/dist:ro
+      - ../cloud-local/supla-cloud/docker-php-entrypoint.sh:/usr/local/bin/docker-php-entrypoint:ro
