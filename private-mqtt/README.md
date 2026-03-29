@@ -115,6 +115,36 @@ W wariancie DB auth:
 - hasło: wartość, którą haszujesz do `mqtt_broker_auth_password`,
 - konto techniczne `MQTT_BROKER_USERNAME` nadal jest potrzebne do połączenia `supla-server` z brokerem.
 
+## Generowanie hasła MQTT
+
+Dla wariantu `docker-compose.db-auth.yml` możesz wygenerować lub zresetować hasło użytkownika bez ręcznej edycji SQL:
+
+```bash
+docker compose -f docker-compose.db-auth.yml exec mqtt-auth \
+  python manage_mqtt_password.py --email twoj_uzytkownik@example.com
+```
+
+Po wykonaniu komendy skrypt:
+
+- ustawia `mqtt_broker_enabled = 1`,
+- zapisuje hash w `mqtt_broker_auth_password`,
+- wypisuje jawne hasło tylko raz na stdout.
+
+Jeżeli chcesz ustawić własne hasło zamiast losowego:
+
+```bash
+docker compose -f docker-compose.db-auth.yml exec mqtt-auth \
+  python manage_mqtt_password.py --email twoj_uzytkownik@example.com \
+  --password 'TwojeSilneHaslo123'
+```
+
+Możesz też wskazać użytkownika przez `short_unique_id`:
+
+```bash
+docker compose -f docker-compose.db-auth.yml exec mqtt-auth \
+  python manage_mqtt_password.py --suid TWOJ_SHORT_UNIQUE_ID
+```
+
 ## Zakres ACL w wariancie DB auth
 
 Dozwolony odczyt i subskrypcja:
