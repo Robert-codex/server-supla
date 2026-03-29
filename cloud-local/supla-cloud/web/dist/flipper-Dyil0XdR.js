@@ -1,0 +1,1 @@
+import{_ as n,c as s,o,X as t}from"./index-DzjYg98v.js";const r={props:["flipped"]},a={class:"flip-container"},i={key:0,class:"front"},p={key:1,class:"back"};function l(e,_,c,d,f,k){return o(),s("div",a,[c.flipped?(o(),s("div",p,[t(e.$slots,"back")])):(o(),s("div",i,[t(e.$slots,"front")]))])}const h=n(r,[["render",l]]);export{h as F};

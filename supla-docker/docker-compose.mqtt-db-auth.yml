@@ -2,6 +2,8 @@ services:
   supla-server:
     depends_on:
       - mosquitto
+    networks:
+      - mqtt-db-auth
 
   mqtt-auth:
     container_name: ${COMPOSE_PROJECT_NAME}-mqtt-auth
@@ -12,6 +14,8 @@ services:
       - .env.default
       - .env
     environment:
+      MQTT_BROKER_USERNAME: ${MQTT_BROKER_USERNAME}
+      MQTT_BROKER_PASSWORD: ${MQTT_BROKER_PASSWORD}
       SUPLA_DB_HOST: supla-db
       SUPLA_DB_PORT: 3306
       SUPLA_DB_NAME: supla
@@ -23,29 +27,40 @@ services:
       driver: json-file
       options:
         max-size: 50m
+    networks:
+      - mqtt-db-auth
 
   mosquitto:
     container_name: ${COMPOSE_PROJECT_NAME}-mosquitto
     restart: unless-stopped
-    image: iegomez/mosquitto-go-auth:3.0.0
+    image: iegomez/mosquitto-go-auth:2.1.0-mosquitto_2.0.15
     env_file:
       - .env.default
       - .env
+    environment:
+      SUPLA_DB_HOST: supla-db
+      SUPLA_DB_PORT: 3306
+      SUPLA_DB_NAME: supla
+      SUPLA_DB_USER: supla
+      SUPLA_DB_PASSWORD: ${DB_PASSWORD}
     command:
-      - mosquitto
-      - -c
-      - /etc/mosquitto/mosquitto.conf
+      - /bin/sh
+      - /usr/local/bin/start-db-auth.sh
     ports:
       - "${MQTT_TLS_PORT:-8883}:8883"
     volumes:
       - ./mqtt/config/mosquitto-go-auth/mosquitto-tls.conf:/etc/mosquitto/mosquitto.conf:ro
-      - ./mqtt/config/mosquitto-go-auth/go-auth-http.conf:/etc/mosquitto/conf.d/go-auth.conf:ro
+      - ./mqtt/config/mosquitto-go-auth/go-auth-http.conf:/usr/local/share/go-auth.conf.tpl:ro
+      - ./mqtt/config/mosquitto-go-auth/start-db-auth.sh:/usr/local/bin/start-db-auth.sh:ro
       - ./mqtt/ssl/mqtt:/mosquitto/certs:ro
       - ${VOLUME_DATA}/mosquitto/data:/mosquitto/data
       - ${VOLUME_DATA}/mosquitto/log:/mosquitto/log
-    depends_on:
-      - mqtt-auth
     logging:
       driver: json-file
       options:
         max-size: 50m
+    networks:
+      - mqtt-db-auth
+
+networks:
+  mqtt-db-auth: {}

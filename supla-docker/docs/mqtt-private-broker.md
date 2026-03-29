@@ -83,10 +83,11 @@ docker compose exec supla-db mariadb -usupla -p"$DB_PASSWORD" supla
 
 ```sql
 UPDATE supla_user
-SET mqtt_broker_enabled = 1,
-    mqtt_broker_auth_password = SHA2('twoje_haslo_mqtt', 512)
+SET mqtt_broker_enabled = 1
 WHERE email = 'twoj_uzytkownik@example.com';
 ```
+
+W wariancie `docker-compose.mqtt-db-auth.yml` hasło użytkownika ustawiaj przez `manage_mqtt_password.py`, bo broker oczekuje formatu `PBKDF2` zgodnego z `mosquitto-go-auth`.
 
 ## 5. Jak logować się do MQTT
 
@@ -98,7 +99,7 @@ W wariancie prostym i TLS bez DB auth:
 W wariancie `docker-compose.mqtt-db-auth.yml`:
 
 - login: `short_unique_id` użytkownika SUPLA
-- hasło: to samo, które wpiszesz do `mqtt_broker_auth_password` przez `SHA2(..., 512)`
+- hasło: jawna wartość wypisana przez `manage_mqtt_password.py`
 - `MQTT_BROKER_USERNAME` i `MQTT_BROKER_PASSWORD` nadal są używane przez `supla-server` jako techniczne konto brokera
 
 ## 6. Generowanie hasła MQTT
@@ -113,7 +114,7 @@ docker compose -f docker-compose.yml -f docker-compose.standalone.yml -f docker-
 Skrypt:
 
 - ustawia `mqtt_broker_enabled = 1`,
-- zapisuje `SHA2(haslo, 512)` do `mqtt_broker_auth_password`,
+- zapisuje hash `PBKDF2` kompatybilny z `mosquitto-go-auth` do `mqtt_broker_auth_password`,
 - wypisuje wygenerowane hasło tylko raz.
 
 Możesz też podać własne hasło:
@@ -139,7 +140,7 @@ Dozwolony zapis:
 
 ## 8. Uwagi techniczne
 
-- Wariant `docker-compose.mqtt-db-auth.yml` używa `iegomez/mosquitto-go-auth:3.0.0`.
+- Wariant `docker-compose.mqtt-db-auth.yml` używa `iegomez/mosquitto-go-auth:2.1.0-mosquitto_2.0.15`.
 - Repo `mosquitto-go-auth` zostało zarchiwizowane 8 czerwca 2025, więc warto pinować wersję obrazu i testować upgrade osobno.
-- Auth z bazy SUPLA jest realizowany przez mały serwis HTTP w `mqtt/auth-service/`, a nie przez wspólne hasło brokera.
-- Ten sam serwis dopuszcza też techniczne konto `MQTT_BROKER_USERNAME`, żeby `supla-server` mógł publikować i subskrybować wszystkie topiki.
+- Broker w wariancie DB auth korzysta z backendów `files + mysql`: konto techniczne jest generowane z `.env` przy starcie kontenera, a użytkownicy SUPLA są weryfikowani bezpośrednio z bazy.
+- Serwis `mqtt-auth` pozostaje potrzebny do wygodnego generowania i resetowania haseł użytkowników.

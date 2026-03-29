@@ -1,0 +1,1 @@
+import{Z as r,c as t,o as s,X as d,N as a}from"./index-DzjYg98v.js";const l={__name:"dropdown-menu-content",setup(p){const e=r("dropdownMenu");return(o,n)=>(s(),t("ul",{class:"dropdown-menu",onClick:n[0]||(n[0]=u=>a(e).hide())},[d(o.$slots,"default")]))}};export{l as _};
