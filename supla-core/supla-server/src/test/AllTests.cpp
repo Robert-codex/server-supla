@@ -1,0 +1,57 @@
+/*
+ Copyright (C) AC SOFTWARE SP. Z O.O.
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#include "db/database.h"
+#include "gtest/gtest.h"
+#include "svrcfg.h"
+#include "tools.h"
+
+#ifdef __OPENSSL_TOOLS
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+#endif /*__OPENSSL_TOOLS*/
+
+int main(int argc, char **argv) {
+  st_hook_signals();
+
+  supla_user::init();
+  database::mainthread_init();
+  ::testing::InitGoogleTest(&argc, argv);
+
+  if (svrcfg_init(argc, argv) == 0) return EXIT_FAILURE;
+
+  int result = RUN_ALL_TESTS();
+
+  svrcfg_free();
+
+#ifdef __OPENSSL_TOOLS
+  EVP_cleanup();
+  ERR_clear_error();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    ERR_remove_thread_state(NULL);
+#pragma GCC diagnostic pop
+  ERR_free_strings();
+  CRYPTO_cleanup_all_ex_data();
+#endif /*__OPENSSL_TOOLS*/
+
+  database::mainthread_end();
+  supla_user::user_free();
+
+  return result;
+}

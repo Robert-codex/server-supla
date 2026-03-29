@@ -1,0 +1,87 @@
+/*
+ Copyright (C) AC SOFTWARE SP. Z O.O.
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+#ifndef ACTION_H_
+#define ACTION_H_
+
+#include <list>
+#include <string>
+
+#include "abstract_worker.h"
+#include "proto.h"
+
+#define MIN_RETRY_TIME 5
+#define MIN_CHECK_TIME 1
+
+class s_worker_action {
+ private:
+  bool _is_action_allowed(void);
+
+ protected:
+  s_abstract_worker *worker;
+
+  virtual bool is_action_allowed(void) = 0;
+  virtual bool do_action(void) = 0;
+  virtual bool result_success(int *fail_result_code) = 0;
+
+  virtual bool check_before_start(void);
+  virtual bool retry_when_fail(void);
+
+ public:
+  virtual int waiting_time_to_retry(void) = 0;  // return seconds
+  virtual int waiting_time_to_check(void) = 0;  // return seconds
+  virtual int try_limit(void) = 0;
+  explicit s_worker_action(s_abstract_worker *worker);
+  virtual ~s_worker_action();
+  void execute(void);
+
+  int get_max_time(void);
+};
+
+class AbstractActionFactory {
+ private:
+  int action_type;
+  std::string classname;
+
+ public:
+  explicit AbstractActionFactory(int action_type, std::string classname);
+  std::string getActionClassName(void);
+  int getActionType(void);
+  virtual s_worker_action *create(s_abstract_worker *worker) = 0;
+  virtual ~AbstractActionFactory(void);
+
+  static AbstractActionFactory *factoryByActionType(int action_type);
+  static s_worker_action *createByActionType(int action_type,
+                                             s_abstract_worker *worker);
+  static std::list<AbstractActionFactory *> factories;
+};
+
+#define REGISTER_ACTION(actionclass, actiontype)                             \
+  class actionclass##Factory : public AbstractActionFactory {                \
+   public:                                                                   \
+    actionclass##Factory();                                                  \
+    s_worker_action *create(s_abstract_worker *worker);                      \
+  };                                                                         \
+  actionclass##Factory::actionclass##Factory()                               \
+      : AbstractActionFactory(actiontype, #actionclass) {}                   \
+  s_worker_action *actionclass##Factory::create(s_abstract_worker *worker) { \
+    return new actionclass(worker);                                          \
+  }                                                                          \
+  static actionclass##Factory global_##actionclass##Factory;
+
+#endif /*ACTION_H_*/

@@ -1,0 +1,106 @@
+services:
+  supla-cloud:
+    container_name: ${COMPOSE_PROJECT_NAME}-cloud
+    restart: unless-stopped
+    image: supla/supla-cloud:${SUPLA_CLOUD_VERSION:-latest}
+    env_file:
+      - .env
+    volumes:
+      - ./ssl/cloud:/etc/apache2/ssl
+      - ${VOLUME_DATA}/cloud-local:/var/www/cloud/var/local
+      - ${VOLUME_DATA}/cloud-logs:/var/www/cloud/var/logs
+      - supla-server-socket:/supla-server
+    ports:
+      - "${PORT_HTTP}:80"
+      - "${PORT_HTTPS}:443"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    depends_on:
+      - supla-db
+
+  supla-db:
+    container_name: ${COMPOSE_PROJECT_NAME}-db
+    restart: unless-stopped
+    image: ${DB_IMAGE}
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: supla
+      MYSQL_USER: supla
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ${VOLUME_DATA}/mysql:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+
+  supla-server:
+    container_name: ${COMPOSE_PROJECT_NAME}-server
+    restart: unless-stopped
+    image: supla/supla-server:${SUPLA_SERVER_VERSION:-latest}
+    env_file:
+      - .env
+    volumes:
+      - ./ssl/server:/etc/supla-server/ssl
+      - ./config/supla-server/supla-tls.cfg:/etc/supla-server/supla.cfg:ro
+      - supla-server-socket:/var/run/supla
+    ports:
+      - "2015:2015"
+      - "2016:2016"
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+    depends_on:
+      - supla-cloud
+      - mosquitto
+
+  mqtt-auth:
+    container_name: ${COMPOSE_PROJECT_NAME}-mqtt-auth
+    restart: unless-stopped
+    build:
+      context: ./auth-service
+    environment:
+      SUPLA_DB_HOST: supla-db
+      SUPLA_DB_PORT: 3306
+      SUPLA_DB_NAME: supla
+      SUPLA_DB_USER: supla
+      SUPLA_DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - supla-db
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+
+  mosquitto:
+    container_name: ${COMPOSE_PROJECT_NAME}-mosquitto
+    restart: unless-stopped
+    image: iegomez/mosquitto-go-auth:3.0.0
+    env_file:
+      - .env
+    command:
+      - mosquitto
+      - -c
+      - /etc/mosquitto/mosquitto.conf
+    ports:
+      - "${MQTT_TLS_PORT}:8883"
+    volumes:
+      - ./config/mosquitto-go-auth/mosquitto-tls.conf:/etc/mosquitto/mosquitto.conf:ro
+      - ./config/mosquitto-go-auth/go-auth-http.conf:/etc/mosquitto/conf.d/go-auth.conf:ro
+      - ./ssl/mqtt:/mosquitto/certs:ro
+      - ${VOLUME_DATA}/mosquitto/data:/mosquitto/data
+      - ${VOLUME_DATA}/mosquitto/log:/mosquitto/log
+    depends_on:
+      - mqtt-auth
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
+
+volumes:
+  supla-server-socket: {}

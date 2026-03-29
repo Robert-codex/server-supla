@@ -1,0 +1,10 @@
+.env
+auth-service/__pycache__/
+var/*
+!var/.gitkeep
+ssl/cloud/*
+!ssl/cloud/.gitkeep
+ssl/server/*
+!ssl/server/.gitkeep
+ssl/mqtt/*
+!ssl/mqtt/.gitkeep

@@ -1,0 +1,11 @@
+services:
+  supla-cloud:
+    networks: [default, proxy]
+    environment:
+      - SUPLA_PROTOCOL=http
+      - SUPLA_URL=https://${CLOUD_DOMAIN}
+
+networks:
+  proxy:
+    external: true
+    name: ${DOCKER_NETWORK_NAME:-webproxy}

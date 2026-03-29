@@ -1,0 +1,45 @@
+[GLOBAL]
+device_name=RASBPBERRY PI B+ EXTENSION 01
+device_guid_file=./var/dev_guid
+state_file=./var/last_state.txt
+
+[SERVER]
+host=127.0.0.1
+tcp_port=2015
+ssl_port=2016
+ssl_enabled=Y
+
+[LOCATION]
+ID=
+PASSWORD=
+
+# Available types: https://github.com/SUPLA/supla-core/blob/master/supla-dev/src/devcfg.c#L34
+# Help: https://forum.supla.org
+
+[CHANNEL_0]
+type=RELAYHFD4
+gpio1=27
+
+[CHANNEL_1]
+type=RELAYHFD4
+gpio1=22
+
+[CHANNEL_2]
+type=RELAYHFD4
+gpio1=17
+
+[CHANNEL_3]
+type=SENSORNO
+gpio1=24
+
+[CHANNEL_4]
+type=SENSORNO
+gpio1=23
+
+[CHANNEL_5]
+type=SENSORNO
+gpio1=18
+
+[CHANNEL_6]
+type=DHT22
+w1=22

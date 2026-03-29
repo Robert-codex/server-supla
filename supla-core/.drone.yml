@@ -1,0 +1,115 @@
+kind: pipeline
+name: default
+
+services:
+- name: db
+  image: mariadb:10.7.3
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    MYSQL_DATABASE: test
+- name: tsdb
+  image: timescale/timescaledb:latest-pg14
+  environment:
+     POSTGRES_USER: supla
+     POSTGRES_PASSWORD: supla
+     POSTGRES_DB: tsdb
+     PGDATA: /var/lib/postgresql/data/pgdata
+  command:
+    [
+      "bash",
+      "-lc",
+      "echo \"password_encryption = 'scram-sha-256'\" >> /var/lib/postgresql/data/postgresql.auto.conf; exec docker-entrypoint.sh postgres"
+    ]
+
+steps:
+- name: sub-modules
+  image: devel/supla-core
+  pull: never
+  commands:
+    - git submodule update --init --recursive
+
+- name: supla-server-test
+  image: devel/supla-core
+  pull: never
+  depends_on: [sub-modules, db, tsdb]
+  commands:
+    #    - sleep 10
+    - test/supla-server-test.sh
+
+- name: supla-console-client-test
+  image: devel/supla-core
+  pull: never
+  depends_on: [supla-server-test]
+  when:
+    status: [success, failure]
+  commands:
+    #    - sleep 10
+    - test/supla-console-client-test.sh
+
+- name: supla-scheduler-test
+  image: devel/supla-core
+  pull: never
+  depends_on: [sub-modules]
+  commands:
+    - ./test/supla-scheduler-test.sh
+
+- name: supla-dev-compilation-check
+  image: devel/supla-core
+  pull: never
+  commands:
+    - ./test/supla-dev-compilation-check.sh
+
+- name: supla-server-compilation-check
+  image: devel/supla-core
+  pull: never
+  depends_on: [sub-modules]
+  commands:
+    - ./test/supla-server-compilation-check.sh
+
+- name: supla-scheduler-compilation-check
+  image: devel/supla-core
+  pull: never
+  depends_on: [sub-modules]
+  commands:
+    - ./test/supla-scheduler-compilation-check.sh
+
+- name: supla-console-client-compilation-check
+  image: devel/supla-core
+  pull: never
+  commands:
+    - ./test/supla-console-client-compilation-check.sh
+
+
+- name: cpplint
+  image: devel/supla-core
+  pull: never
+  commands:
+    - ./tools/lint.sh
+
+- name: joining
+  image: devel/supla-core
+  pull: never
+  depends_on: [supla-server-test, supla-scheduler-test, supla-console-client-test, supla-dev-compilation-check, supla-server-compilation-check, supla-scheduler-compilation-check, supla-console-client-compilation-check, cpplint]
+  commands:
+    - echo "test"
+      
+    #- name: test
+    # image: mariadb
+  #  commands:
+  # - ./supladevicetests --gtest_repeat=50 --gtest_shuffle
+
+- name: rocket
+  image: mike1pol/drone-rocket
+  depends_on: [joining]
+  settings:
+    url: { from_secret: rocket_url }
+    user_id: { from_secret: rocket_user }
+    token: { from_secret: rocket_token }
+    channel: github
+    avatar_url: "https://miro.medium.com/max/256/0*AqO_2lNemh_Fl9Gm.png"
+  when:
+    status: [success, failure]
+    event:
+      exclude:
+        - pull_request
+

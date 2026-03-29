@@ -1,0 +1,5 @@
+Test/supla-server
+Debug/supla-server
+Release/supla-server
+Release-MariaDB/supla-server
+/Debug-Asan/

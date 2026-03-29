@@ -1,0 +1,64 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := ssl
+LOCAL_SRC_FILES := $(OPENSSL_ANDROID)/libs/$(TARGET_ARCH_ABI)/libssl.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := crypto
+LOCAL_SRC_FILES := $(OPENSSL_ANDROID)/libs/$(TARGET_ARCH_ABI)/libcrypto.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
+_16K_ABIS := arm64-v8a x86_64
+
+ifneq (,$(filter $(_16K_ABIS),$(TARGET_ARCH_ABI)))
+    LOCAL_LDFLAGS += -Wl,-z,max-page-size=0x4000
+endif
+
+LOCAL_MODULE := libsuplaclient
+LOCAL_SRC_FILES := supla.cpp \
+    main.cpp \
+    actions.cpp \
+    single_call.cpp \
+    push.cpp \
+    channel_config.cpp \
+    channel_config_hvac.cpp \
+    channel_config_weekly_schedule.cpp \
+    channel_config_general_purpose_measurement.cpp \
+    channel_config_general_purpose_meter.cpp \
+    channel_config_roller_shutter.cpp \
+    channel_config_facade_blind.cpp \
+    channel_config_container.cpp \
+    device_config.cpp \
+    ../../src/cfg.c \
+    ../../src/eh.c \
+    ../../src/ini.c \
+    ../../src/lck.c \
+    ../../src/log.c \
+    ../../src/proto.c \
+    ../../src/safearray.c \
+    ../../src/srpc.c \
+    ../../src/sthread.c \
+    ../../src/supla-client.c \
+    ../../src/suplasinglecall.cpp \
+    ../../src/supla-socket.c \
+    ../../src/tools.c
+
+LOCAL_C_INCLUDES := $(OPENSSL_ANDROID)/include \
+                    ../src
+
+LOCAL_LDLIBS := -llog -landroid
+
+LOCAL_SHARED_LIBRARIES := ssl crypto
+
+LOCAL_STATIC_LIBRARIES := cpufeatures
+LOCAL_CFLAGS += -DNOMYSQL -DSRPC_WITHOUT_IN_QUEUE -DSRPC_WITHOUT_OUT_QUEUE \
+                -DSPROTO_WITHOUT_OUT_BUFFER -DUSE_DEPRECATED_EMEV_V1 \
+                -DUSE_DEPRECATED_EMEV_V2 -fPIC -g
+
+include $(BUILD_SHARED_LIBRARY)
+
+$(call import-module,android/cpufeatures)

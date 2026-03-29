@@ -1,0 +1,61 @@
+services:
+  supla-cloud:
+    container_name: ${COMPOSE_PROJECT_NAME}-cloud
+    restart: unless-stopped
+    image: supla/supla-cloud:${SUPLA_CLOUD_VERSION:-latest}
+    env_file:
+      - .env.default
+      - .env
+    volumes:
+      - ./ssl/cloud:/etc/apache2/ssl
+      - ${VOLUME_DATA}/cloud-local:/var/www/cloud/var/local
+      - ${VOLUME_DATA}/cloud-logs:/var/www/cloud/var/logs
+      - supla-server-socket:/supla-server
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 50m
+    depends_on:
+      - supla-db
+
+  supla-db:
+    container_name: ${COMPOSE_PROJECT_NAME}-db
+    restart: unless-stopped
+    image: ${DB_IMAGE}
+    env_file:
+      - .env.default
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: supla
+      MYSQL_USER: supla
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ${VOLUME_DATA}/mysql:/var/lib/mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 50m
+
+  supla-server:
+    container_name: ${COMPOSE_PROJECT_NAME}-server
+    restart: unless-stopped
+    image: supla/supla-server:${SUPLA_SERVER_VERSION:-latest}
+    env_file:
+      - .env.default
+      - .env
+    volumes:
+      - ./ssl/server:/etc/supla-server/ssl
+      - supla-server-socket:/var/run/supla
+    ports:
+      - "2016:2016"
+      - "2015:2015"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 50m
+    depends_on:
+      - supla-cloud
+
+volumes:
+  supla-server-socket: {}

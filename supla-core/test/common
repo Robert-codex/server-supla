@@ -1,0 +1,29 @@
+#!/bin/bash
+
+vg_verify() {
+   valgrind --version
+   valgrind --tool=memcheck --leak-check=full --track-origins=no $1 2>&1 | tee valgrind.log
+   if [ "$2" != "--no-leak-check" ]; then
+     if grep -E "definitely lost: [1-9]|indirectly lost: [1-9]|possibly lost: [1-9]" valgrind.log; then
+       echo "Memory leak detected"
+       exit 1
+     fi
+   else
+     echo "Leak detection skipped"
+   fi
+   rm valgrind.log
+}
+
+db_init() {
+   if ! (echo "" | mysql --ssl=0 -u supla -h $DBHOST) 2> /dev/null; then
+      if ! mysql --ssl=0 -u root -h $DBHOST < sql/CreateSqlUsersForTestPurposes.sql 2> /dev/null; then
+         if ! mysql --ssl=0 -u root -proot -h $DBHOST < sql/CreateSqlUsersForTestPurposes.sql 2> /dev/null; then
+         echo "Enter mariadb root password.";
+         mysql --ssl=0 -u root -h $DBHOST -p < sql/CreateSqlUsersForTestPurposes.sql
+         fi
+      fi
+   fi
+
+   mysql --ssl=0 -u supla -h $DBHOST < sql/RecreateTestDatabase.sql
+   mysql --ssl=0 -u supla -h $DBHOST supla_test < sql/TestDatabaseStructureAndData.sql
+}

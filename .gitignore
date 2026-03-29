@@ -1,0 +1,7 @@
+**/.env
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+**/.idea/
+supla-core/.git.local-backup/
+supla-docker/.git.local-backup/

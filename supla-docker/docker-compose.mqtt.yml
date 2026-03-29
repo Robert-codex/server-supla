@@ -1,0 +1,31 @@
+services:
+  supla-server:
+    depends_on:
+      - mosquitto
+
+  mosquitto:
+    container_name: ${COMPOSE_PROJECT_NAME}-mosquitto
+    restart: unless-stopped
+    image: eclipse-mosquitto:2
+    env_file:
+      - .env.default
+      - .env
+    command:
+      - /bin/sh
+      - -c
+      - |
+        if [ ! -s /mosquitto/config/passwd ]; then
+          mosquitto_passwd -b -c /mosquitto/config/passwd "$$MQTT_BROKER_USERNAME" "$$MQTT_BROKER_PASSWORD";
+        fi
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+    volumes:
+      - ./mqtt/config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mqtt/config/mosquitto/passwd:/mosquitto/config/passwd
+      - ${VOLUME_DATA}/mosquitto/data:/mosquitto/data
+      - ${VOLUME_DATA}/mosquitto/log:/mosquitto/log
+    logging:
+      driver: json-file
+      options:
+        max-size: 50m
