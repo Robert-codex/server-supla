@@ -4,6 +4,7 @@ services:
       ACCOUNT_LIMITS_SELF_UPDATE_ENABLED: ${ACCOUNT_LIMITS_SELF_UPDATE_ENABLED:-false}
     volumes:
       - ../cloud-local/supla-cloud/app/config/security.yml:/var/www/cloud/app/config/security.yml:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/ServerController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/ServerController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/UserController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/UserController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/TokenController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/TokenController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/TwoFactorController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/TwoFactorController.php:ro
@@ -15,6 +16,7 @@ services:
       - ../cloud-local/supla-cloud/src/SuplaBundle/Supla/SuplaAutodiscover.php:/var/www/cloud/src/SuplaBundle/Supla/SuplaAutodiscover.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Twig/FrontendConfig.php:/var/www/cloud/src/SuplaBundle/Twig/FrontendConfig.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:ro
       - ../cloud-local/supla-cloud/app/config/services/services.yml:/var/www/cloud/app/config/services/services.yml:ro
       - ../cloud-local/supla-cloud/web/index.html:/var/www/cloud/web/index.html:ro
       - ../cloud-local/supla-cloud/web/dist:/var/www/cloud/web/dist:ro

@@ -1,1 +1,1 @@
-export { L } from "./login-form-C8Lf4buW-loginfix.js";
+export { L } from "./login-form-C8Lf4buW-edgefix.js";
