@@ -425,6 +425,11 @@ abstract class SuplaAutodiscover {
     }
 
     public function fetchEnergyPriceForecast(): array {
-        return $this->remoteRequest('/energy-price-forecast') ?: [];
+        try {
+            $forecast = $this->remoteRequest('/energy-price-forecast');
+        } catch (ApiException $e) {
+            return [];
+        }
+        return is_array($forecast) && array_is_list($forecast) ? $forecast : [];
     }
 }

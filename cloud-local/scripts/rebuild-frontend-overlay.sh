@@ -34,6 +34,12 @@ perl -0pi -e \
 perl -0pi -e \
   's#type:"email",required:"",autocorrect#type:"email",required:"",autocomplete:"username",autocorrect#g; s#type:"password",placeholder#type:"password",autocomplete:"current-password",placeholder#g' \
   "${login_form_local}"
+perl -0pi -e \
+  's#mounted\(\)\{this\.username=this\.intitialUsername\|\|""\}#mounted(){this.username=this.intitialUsername||"",this.__THIS_NEXT_TICK__(()=>{const e=this.__THIS_EL__?.querySelector('\''input[name="_username"]'\''),t=this.__THIS_EL__?.querySelector('\''input[name="_password"]'\''),o=this.__THIS_EL__?.closest('\''form'\'');e&&e.setAttribute('\''autocomplete'\'','\''username'\''),t&&t.setAttribute('\''autocomplete'\'','\''current-password'\''),o&&o.setAttribute('\''autocomplete'\'','\''on'\'')})}#g' \
+  "${login_form_local}"
+perl -0pi -e \
+  's#__THIS_NEXT_TICK__#\$nextTick#g; s#__THIS_EL__#\$el#g' \
+  "${login_form_local}"
 
 cp "${login_page_source}" "${login_page_local}"
 perl -0pi -e \
