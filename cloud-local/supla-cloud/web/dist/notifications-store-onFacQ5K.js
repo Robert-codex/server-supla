@@ -1,0 +1,1 @@
+import{x as n,ac as r,ab as c,ad as u}from"./index-DfO4cloU-limitsfix.js";const f={async getList(){const{body:t}=await n.get("notifications");return t}},d=c("notifications",()=>{const{all:t,ids:s,list:i,ready:o,$reset:e,fetchAll:a}=u(f);return{all:t,ids:s,list:i,ready:o,$reset:e,fetchAll:a}});function p(t){const{store:s}=r(d(),t);return s}export{p as a,d as u};

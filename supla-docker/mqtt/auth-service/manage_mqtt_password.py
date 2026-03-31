@@ -5,7 +5,7 @@ from contextlib import closing
 
 import pymysql
 
-from app import db_connect
+from app import db_connect, hash_password
 
 
 PASSWORD_ALPHABET = string.ascii_letters + string.digits
@@ -64,16 +64,17 @@ def find_user(cursor, email: str | None, suid: str | None):
 
 
 def update_password(user_id: int, password: str):
+    password_hash = hash_password(password)
     with closing(db_connect()) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
                 UPDATE supla_user
                 SET mqtt_broker_enabled = 1,
-                    mqtt_broker_auth_password = SHA2(%s, 512)
+                    mqtt_broker_auth_password = %s
                 WHERE id = %s
                 """,
-                (password, user_id),
+                (password_hash, user_id),
             )
             return cur.rowcount
 

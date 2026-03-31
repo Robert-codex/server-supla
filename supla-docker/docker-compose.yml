@@ -48,8 +48,8 @@ services:
       - ./ssl/server:/etc/supla-server/ssl
       - supla-server-socket:/var/run/supla
     ports:
-      - "2016:2016"
-      - "2015:2015"
+      - "${PORT_SUPLA_CLIENT:-2016}:2016"
+      - "${PORT_SUPLA_DEVICE:-2015}:2015"
     logging:
       driver: "json-file"
       options:

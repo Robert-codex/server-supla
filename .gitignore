@@ -5,3 +5,4 @@
 **/.idea/
 supla-core/.git.local-backup/
 supla-docker/.git.local-backup/
+test-results/

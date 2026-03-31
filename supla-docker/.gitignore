@@ -5,3 +5,8 @@ __pycache__/
 *.crt
 *.key
 *.tar.gz
+var/backups/
+var/cloud-logs/
+var/mosquitto/data/
+var/mosquitto/log/
+var/mysql/

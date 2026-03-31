@@ -8,15 +8,14 @@ Ten katalog zawiera samodzielny przykład prywatnego wdrożenia SUPLA z własnym
 - `docker-compose.tls.yml` - wariant z MQTT over TLS na `8883`.
 - `docker-compose.db-auth.yml` - wariant TLS z autoryzacją użytkowników MQTT przez bazę SUPLA.
 - `.env.example` - bezpieczny szablon zmiennych środowiskowych.
-- `config/supla-server/supla-tls.cfg` - jawna konfiguracja `supla-server` dla wariantów TLS.
 - `config/mosquitto/` - konfiguracja zwykłego Mosquitto.
 - `config/mosquitto-go-auth/` - konfiguracja brokera z HTTP auth/ACL dla wariantu DB auth.
 - `auth-service/` - mały serwis Flask sprawdzający użytkowników MQTT w bazie SUPLA.
 
 ## Ważna różnica między wariantami
 
-- `docker-compose.yml` nie montuje ręcznie `supla.cfg`. W tym wariancie obraz `supla/supla-server` korzysta z ustawień przekazanych przez `.env`.
-- `docker-compose.tls.yml` i `docker-compose.db-auth.yml` montują `config/supla-server/supla-tls.cfg`, bo wymagają jawnego ustawienia połączenia MQTT przez TLS.
+- `docker-compose.yml` używa brokera MQTT bez TLS na porcie `1883`.
+- `docker-compose.tls.yml` i `docker-compose.db-auth.yml` wymuszają połączenie `supla-server -> broker` przez TLS na porcie `8883`.
 
 ## Przygotowanie
 
@@ -33,6 +32,10 @@ Uzupełnij co najmniej:
 - `MQTT_BROKER_PASSWORD`
 - `MAILPIT_SMTP_PORT`
 - `MAILPIT_WEB_PORT`
+
+Jeżeli deployment ma działać bez zależności od `autodiscover.supla.org`, ustaw też:
+
+- `SUPLA_AUTODISCOVER_URL=` (pusta wartość)
 
 Jeżeli używasz TLS, ustaw też port `MQTT_TLS_PORT`.
 
@@ -93,14 +96,7 @@ SET mqtt_broker_enabled = 1
 WHERE email = 'twoj_uzytkownik@example.com';
 ```
 
-Dla wariantu `docker-compose.db-auth.yml` ustaw również hasło MQTT użytkownika:
-
-```sql
-UPDATE supla_user
-SET mqtt_broker_enabled = 1,
-    mqtt_broker_auth_password = SHA2('twoje_haslo_mqtt', 512)
-WHERE email = 'twoj_uzytkownik@example.com';
-```
+Dla wariantu `docker-compose.db-auth.yml` samo ustawienie `mqtt_broker_enabled` nie wystarcza. Hasło użytkownika ustawiaj przez `manage_mqtt_password.py`, bo broker oczekuje formatu `PBKDF2` zgodnego z `mosquitto-go-auth`.
 
 ## Logowanie do MQTT
 
@@ -112,7 +108,7 @@ W wariancie bazowym i TLS bez DB auth:
 W wariancie DB auth:
 
 - login: `short_unique_id` użytkownika SUPLA,
-- hasło: wartość, którą haszujesz do `mqtt_broker_auth_password`,
+- hasło: jawna wartość wypisana przez `manage_mqtt_password.py`,
 - konto techniczne `MQTT_BROKER_USERNAME` nadal jest potrzebne do połączenia `supla-server` z brokerem.
 
 ## Generowanie hasła MQTT
@@ -127,7 +123,7 @@ docker compose -f docker-compose.db-auth.yml exec mqtt-auth \
 Po wykonaniu komendy skrypt:
 
 - ustawia `mqtt_broker_enabled = 1`,
-- zapisuje hash w `mqtt_broker_auth_password`,
+- zapisuje hash `PBKDF2` kompatybilny z `mosquitto-go-auth` w `mqtt_broker_auth_password`,
 - wypisuje jawne hasło tylko raz na stdout.
 
 Jeżeli chcesz ustawić własne hasło zamiast losowego:
@@ -160,6 +156,7 @@ Dozwolony zapis:
 
 ## Uwagi praktyczne
 
-- Wariant `docker-compose.db-auth.yml` używa obrazu `iegomez/mosquitto-go-auth:3.0.0`.
+- Wariant `docker-compose.db-auth.yml` używa obrazu `iegomez/mosquitto-go-auth:2.1.0-mosquitto_2.0.15`.
+- Broker w wariancie DB auth korzysta z backendów `files + mysql`: konto techniczne jest generowane z `.env` przy starcie kontenera, a użytkownicy SUPLA są weryfikowani bezpośrednio z bazy.
 - `private-mqtt/var/` zawiera dane runtime i logi, więc nie powinien być publikowany.
 - Jeśli chcesz bazować na oficjalnym stacku zamiast tego uproszczonego przykładu, użyj `../supla-docker/` i jego overlayów MQTT.

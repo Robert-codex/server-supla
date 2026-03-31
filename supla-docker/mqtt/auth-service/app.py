@@ -1,5 +1,10 @@
+import base64
+import hashlib
+import hmac
+import json
 import os
 import re
+import secrets
 from contextlib import closing
 
 import pymysql
@@ -11,10 +16,15 @@ app = Flask(__name__)
 HOMEASSISTANT_PREFIX_RE = re.compile(
     r"^homeassistant/[^/]+/(?P<suid>[^/]+)(?:/.*)?$"
 )
+PBKDF2_PREFIX = "PBKDF2"
+PBKDF2_ALGORITHM = "sha256"
+PBKDF2_ITERATIONS = 100000
+PBKDF2_KEY_LENGTH = 32
+PBKDF2_SALT_SIZE = 16
 
 
 def json_response(ok: bool, error: str = "", status_code: int = 200):
-    return jsonify({"Ok": ok, "Error": error}), status_code
+    return jsonify({"ok": ok, "error": error}), status_code
 
 
 def db_connect():
@@ -31,7 +41,87 @@ def db_connect():
 
 
 def request_data():
-    return request.get_json(silent=True) or request.form or {}
+    data = request.get_json(silent=True)
+    if data:
+        return data
+
+    if request.form:
+        return request.form
+
+    raw_body = request.get_data(as_text=True).strip()
+    if raw_body:
+        try:
+            parsed = json.loads(raw_body)
+        except json.JSONDecodeError:
+            parsed = None
+        if isinstance(parsed, dict):
+            return parsed
+
+    return {}
+
+
+def request_value(data, *keys) -> str:
+    for key in keys:
+        value = data.get(key)
+        if value is not None:
+            return str(value)
+    return ""
+
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_bytes(PBKDF2_SALT_SIZE)
+    derived_key = hashlib.pbkdf2_hmac(
+        PBKDF2_ALGORITHM,
+        password.encode("utf-8"),
+        salt,
+        PBKDF2_ITERATIONS,
+        dklen=PBKDF2_KEY_LENGTH,
+    )
+    salt_b64 = base64.b64encode(salt).decode("ascii")
+    hash_b64 = base64.b64encode(derived_key).decode("ascii")
+    return (
+        f"{PBKDF2_PREFIX}${PBKDF2_ALGORITHM}${PBKDF2_ITERATIONS}$"
+        f"{salt_b64}${hash_b64}"
+    )
+
+
+def verify_pbkdf2_password(password: str, stored_hash: str) -> bool:
+    parts = stored_hash.split("$")
+    if len(parts) != 5 or parts[0] != PBKDF2_PREFIX:
+        return False
+
+    _, algorithm, iterations_raw, salt_b64, expected_b64 = parts
+
+    try:
+        iterations = int(iterations_raw)
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(expected_b64)
+    except (ValueError, TypeError):
+        return False
+
+    try:
+        calculated = hashlib.pbkdf2_hmac(
+            algorithm,
+            password.encode("utf-8"),
+            salt,
+            iterations,
+            dklen=len(expected),
+        )
+    except ValueError:
+        return False
+
+    return hmac.compare_digest(calculated, expected)
+
+
+def verify_password(password: str, stored_hash: str | None) -> bool:
+    if not stored_hash:
+        return False
+
+    if stored_hash.startswith(f"{PBKDF2_PREFIX}$"):
+        return verify_pbkdf2_password(password, stored_hash)
+
+    legacy_hash = hashlib.sha512(password.encode("utf-8")).hexdigest()
+    return hmac.compare_digest(legacy_hash, stored_hash.lower())
 
 
 def service_account() -> tuple[str, str]:
@@ -76,21 +166,25 @@ def user_authenticated(username: str, password: str) -> bool:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT 1
+                SELECT su.mqtt_broker_auth_password AS auth_password
                 FROM supla_user su
-                LEFT JOIN supla_oauth_client_authorizations soca
-                  ON su.id = soca.user_id
                 WHERE su.mqtt_broker_enabled = 1
                   AND su.short_unique_id = BINARY %s
-                  AND (
-                    su.mqtt_broker_auth_password = SHA2(%s, 512)
-                    OR soca.mqtt_broker_auth_password = SHA2(%s, 512)
-                  )
-                LIMIT 1
+                  AND su.mqtt_broker_auth_password IS NOT NULL
+                UNION ALL
+                SELECT soca.mqtt_broker_auth_password AS auth_password
+                FROM supla_oauth_client_authorizations soca
+                JOIN supla_user su ON su.id = soca.user_id
+                WHERE su.mqtt_broker_enabled = 1
+                  AND su.short_unique_id = BINARY %s
+                  AND soca.mqtt_broker_auth_password IS NOT NULL
                 """,
-                (username, password, password),
+                (username, username),
             )
-            return cur.fetchone() is not None
+            return any(
+                verify_password(password, row["auth_password"])
+                for row in cur.fetchall()
+            )
 
 
 def topic_matches_user(topic: str, username: str) -> bool:
@@ -141,8 +235,8 @@ def health():
 @app.post("/auth/user")
 def auth_user():
     data = request_data()
-    username = str(data.get("username", "")).strip()
-    password = str(data.get("password", ""))
+    username = request_value(data, "username", "user", "token").strip()
+    password = request_value(data, "password", "pass", "pwd")
 
     if is_service_account(username, password):
         return json_response(True)
@@ -156,8 +250,8 @@ def auth_user():
 @app.post("/auth/superuser")
 def auth_superuser():
     data = request_data()
-    username = str(data.get("username", "")).strip()
-    password = str(data.get("password", ""))
+    username = request_value(data, "username", "user", "token").strip()
+    password = request_value(data, "password", "pass", "pwd")
 
     if is_service_account(username, password):
         return json_response(True)
@@ -168,11 +262,11 @@ def auth_superuser():
 @app.post("/auth/acl")
 def auth_acl():
     data = request_data()
-    username = str(data.get("username", "")).strip()
-    topic = str(data.get("topic", "")).strip()
+    username = request_value(data, "username", "user", "token").strip()
+    topic = request_value(data, "topic").strip()
 
     try:
-        access = int(data.get("acc", 0))
+        access = int(request_value(data, "acc", "access", "acl"))
     except (TypeError, ValueError):
         return json_response(False, "invalid access value", 400)
 

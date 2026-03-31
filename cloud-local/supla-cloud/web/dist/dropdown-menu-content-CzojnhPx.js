@@ -1,0 +1,1 @@
+import{a0 as r,c as t,o as s,Z as a,P as d}from"./index-DfO4cloU-limitsfix.js";const l={__name:"dropdown-menu-content",setup(p){const e=r("dropdownMenu");return(o,n)=>(s(),t("ul",{class:"dropdown-menu",onClick:n[0]||(n[0]=u=>d(e).hide())},[a(o.$slots,"default")]))}};export{l as _};

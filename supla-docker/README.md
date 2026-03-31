@@ -48,6 +48,8 @@ If you want to run your own MQTT broker next to SUPLA, use the overlay files:
 
 The setup steps, required `MQTT_BROKER_*` variables, TLS certificate paths, and DB-backed auth flow are described in [docs/mqtt-private-broker.md](docs/mqtt-private-broker.md).
 
+For a fully private deployment that should not call `autodiscover.supla.org` at runtime, set `SUPLA_AUTODISCOVER_URL=` in `.env` and include `docker-compose.cloud-local.yml`.
+
 ## Upgrading to the newest version
 ```
 cd supla-docker
