@@ -1,1 +1,1 @@
-export { R } from "./resend-account-activation-link-DP8hDyU_-loginfix.js";
+export { R } from "./resend-account-activation-link-DP8hDyU_-edgefix.js";
