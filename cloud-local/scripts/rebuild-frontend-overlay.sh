@@ -31,10 +31,16 @@ cp "${login_form_source}" "${login_form_local}"
 perl -0pi -e \
   's#\./index-DfO4cloU-limitsfix\.js#./index-DfO4cloU-limitsfix-edgefix.js#g; s#\./resend-account-activation-link-DP8hDyU_\.js#./resend-account-activation-link-DP8hDyU_-edgefix.js#g' \
   "${login_form_local}"
+perl -0pi -e \
+  's#type:"email",required:"",autocorrect#type:"email",required:"",autocomplete:"username",autocorrect#g; s#type:"password",placeholder#type:"password",autocomplete:"current-password",placeholder#g' \
+  "${login_form_local}"
 
 cp "${login_page_source}" "${login_page_local}"
 perl -0pi -e \
   's#\./login-form-C8Lf4buW\.js#./login-form-C8Lf4buW-edgefix.js#g; s#\./index-DfO4cloU-limitsfix\.js#./index-DfO4cloU-limitsfix-edgefix.js#g; s#\./resend-account-activation-link-DP8hDyU_\.js#./resend-account-activation-link-DP8hDyU_-edgefix.js#g' \
+  "${login_page_local}"
+perl -0pi -e \
+  's#type:s\.useRecoveryCode\?"text":"tel",placeholder#type:s.useRecoveryCode?"text":"tel",autocomplete:s.useRecoveryCode?"off":"one-time-code",placeholder#g' \
   "${login_page_local}"
 
 cp "${entry_source}" "${entry_local}"
