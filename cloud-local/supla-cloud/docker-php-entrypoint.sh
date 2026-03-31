@@ -1,9 +1,55 @@
 #!/bin/sh
 set -e
 
-if [ ! -f /etc/apache2/ssl/server.crt ]; then
-  openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/server.key -out /etc/apache2/ssl/server.crt -subj "/C=PL/ST=SUPLA/L=SUPLA/O=SUPLA/CN=SUPLA"
+apache_server_name="${APACHE_SERVER_NAME:-${CLOUD_DOMAIN:-localhost}}"
+db_host="${DB_HOST:-supla-db}"
+db_port="${DB_PORT:-3306}"
+db_name="${DB_NAME:-supla}"
+db_user="${DB_USER:-supla}"
+db_password="${DB_PASSWORD:-DEFAULT_PASSWORD_IS_BAD_IDEA}"
+
+generate_local_certificate() {
+  rm -f /etc/apache2/ssl/server.crt /etc/apache2/ssl/server.key
+  openssl req \
+    -x509 \
+    -nodes \
+    -days 365 \
+    -newkey rsa:2048 \
+    -keyout /etc/apache2/ssl/server.key \
+    -out /etc/apache2/ssl/server.crt \
+    -subj "/C=PL/ST=SUPLA/L=SUPLA/O=SUPLA/CN=${apache_server_name}" \
+    -addext "basicConstraints=critical,CA:FALSE" \
+    -addext "keyUsage=critical,digitalSignature,keyEncipherment" \
+    -addext "extendedKeyUsage=serverAuth" \
+    -addext "subjectAltName=DNS:${apache_server_name},DNS:localhost,IP:127.0.0.1" \
+    >/dev/null 2>&1
+}
+
+if [ ! -f /etc/apache2/ssl/server.crt ] || ! openssl x509 -in /etc/apache2/ssl/server.crt -noout -text | grep -q "CA:FALSE"; then
+  generate_local_certificate
 fi
+
+cat > /etc/apache2/conf-available/servername.conf <<EOF
+ServerName ${apache_server_name}
+EOF
+a2enconf servername >/dev/null
+
+if ! grep -q "^user *= *root$" /etc/supervisor/conf.d/supervisord.conf; then
+  sed -i '/^\[supervisord\]$/a user = root' /etc/supervisor/conf.d/supervisord.conf
+fi
+
+wait_for_database() {
+  php -r '
+    $dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", getenv("WAIT_DB_HOST"), getenv("WAIT_DB_PORT"), getenv("WAIT_DB_NAME"));
+    try {
+        new PDO($dsn, getenv("WAIT_DB_USER"), getenv("WAIT_DB_PASSWORD"), [PDO::ATTR_TIMEOUT => 3]);
+        exit(0);
+    } catch (Throwable $e) {
+        fwrite(STDERR, $e->getMessage() . PHP_EOL);
+        exit(1);
+    }
+  '
+}
 
 if [ "${MAILER_HOST}" != "" ]; then
   echo "[WARN] You are using deprecated e-mail configuration. Please use MAILER_DSN environment variable to configure it."
@@ -76,6 +122,23 @@ if [ ${SUPLA_PROTOCOL:-https} = "https" ]; then
     mv web/.htaccess-tmp web/.htaccess
   fi
 fi
+
+export WAIT_DB_HOST="${db_host}"
+export WAIT_DB_PORT="${db_port}"
+export WAIT_DB_NAME="${db_name}"
+export WAIT_DB_USER="${db_user}"
+export WAIT_DB_PASSWORD="${db_password}"
+for i in $(seq 1 30); do
+  if wait_for_database >/tmp/supla-db-wait.log 2>&1; then
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    cat /tmp/supla-db-wait.log >&2 || true
+    echo "[ERROR] Database did not become ready in time." >&2
+    exit 1
+  fi
+  sleep 2
+done
 
 rm -fr var/cache/*
 php bin/console supla:initialize

@@ -16,6 +16,7 @@ services:
       - ../cloud-local/supla-cloud/src/SuplaBundle/Supla/SuplaAutodiscover.php:/var/www/cloud/src/SuplaBundle/Supla/SuplaAutodiscover.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Twig/FrontendConfig.php:/var/www/cloud/src/SuplaBundle/Twig/FrontendConfig.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:ro
       - ../cloud-local/supla-cloud/app/config/services/services.yml:/var/www/cloud/app/config/services/services.yml:ro
       - ../cloud-local/supla-cloud/web/index.html:/var/www/cloud/web/index.html:ro
       - ../cloud-local/supla-cloud/web/dist:/var/www/cloud/web/dist:ro
