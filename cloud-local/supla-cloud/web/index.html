@@ -26,10 +26,53 @@
         #page-preloader noscript {color: #f60;}
 
         .invisible { visibility: hidden; }
-
         .hidden { display: none; }
     </style>
-  <script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js"></script>
+  <script>
+    // Minimal in-page diagnostics: if JS fails early, show something actionable instead of a white screen.
+    (function () {
+        var preloader = document.getElementById('page-preloader');
+        var vue = document.getElementById('vue-container');
+        var tooLong = function (reason) {
+            try {
+                if (vue) { vue.classList.add('hidden'); }
+                if (preloader) {
+                    preloader.classList.remove('hidden');
+                    preloader.classList.add('too-long');
+                    var box = document.createElement('pre');
+                    box.style.whiteSpace = 'pre-wrap';
+                    box.style.maxWidth = '900px';
+                    box.style.margin = '20px auto 0';
+                    box.style.padding = '12px';
+                    box.style.textAlign = 'left';
+                    box.style.background = '#fff';
+                    box.style.border = '1px solid #ddd';
+                    box.style.borderRadius = '8px';
+                    box.textContent = 'Frontend init failed (' + 'edgefix-v30' + ').\n\n' + String(reason || '');
+                    preloader.appendChild(box);
+                }
+            } catch (e) {}
+        };
+
+        window.addEventListener('error', function (e) {
+            tooLong(e && (e.error && (e.error.stack || e.error.message) || e.message) || e);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            tooLong(e && e.reason || e);
+        });
+
+        setTimeout(function () {
+            try {
+                // If the app did not render anything, keep the preloader visible with a hint.
+                if (vue && (!vue.childNodes || vue.childNodes.length === 0)) {
+                    tooLong('Vue container is empty after 8 seconds.');
+                }
+            } catch (e) {}
+        }, 8000);
+    })();
+  </script>
+  <script src="/dist/qrcode-local.js?v=edgefix-v30"></script>
+  <script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js?v=edgefix-v30"></script>
   <link rel="stylesheet" crossorigin href="/dist/index-DwGX3pD9.css">
 </head>
 <body>

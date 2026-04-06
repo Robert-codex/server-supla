@@ -1,13 +1,26 @@
 security:
   encoders:
     SuplaBundle\Entity\Main\User: bcrypt # changing this to auto, as deprecation suggests, breaks our OAuth tests
+    SuplaBundle\Security\AdminPanelUser: bcrypt
     SuplaBundle\Entity\Main\DirectLink:
       algorithm: bcrypt
       cost: 4
     legacy_encoder: md5
-  hide_user_not_found: false
+  hide_user_not_found: true
 
   firewalls:
+    admin:
+      pattern: ^/admin
+      anonymous: true
+      provider: admin_panel_provider
+      form_login:
+        login_path: admin_login
+        check_path: admin_login
+        default_target_path: /admin/dashboard
+      logout:
+        path: admin_logout
+        target: /admin/login
+
     oauth_token:
       pattern: ^(/api)?(/v\d.\d.\d)?/oauth/v2/token$
       security: false
@@ -25,8 +38,18 @@ security:
       fos_oauth: true
       pattern: ^/api/
       stateless: true
+      provider: supla_db_provider
 
   access_control:
+    - path: ^/admin/login$
+      role: [IS_AUTHENTICATED_ANONYMOUSLY]
+      requires_channel: '%supla_protocol%'
+    - path: ^/admin/(forgot-password|reset-password)$
+      role: [IS_AUTHENTICATED_ANONYMOUSLY]
+      requires_channel: '%supla_protocol%'
+    - path: ^/admin
+      role: [ROLE_ADMIN_PANEL]
+      requires_channel: '%supla_protocol%'
     - path: ^/(api/(v?\d\.\d\.\d/)?(server-status|server-info|user-info|account-deletion|register|forgotten-password|confirm|webapp-tokens|webapp-auth|webapp-two-factor|public-oauth-apps|remove-target-cloud))
       role: [IS_AUTHENTICATED_ANONYMOUSLY]
       requires_channel: '%supla_protocol%'
@@ -38,6 +61,8 @@ security:
       requires_channel: '%supla_protocol%'
 
   providers:
+    admin_panel_provider:
+      id: 'SuplaBundle\Security\AdminPanelUserProvider'
     supla_db_provider:
       id: 'SuplaBundle\Auth\UserProvider'
 

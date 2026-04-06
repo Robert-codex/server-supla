@@ -25,6 +25,7 @@ use OpenApi\Annotations as OA;
 use SuplaBundle\Auth\OAuthScope;
 use SuplaBundle\Auth\UserLoginAttemptListener;
 use SuplaBundle\Auth\SuplaOAuth2;
+use SuplaBundle\Entity\Main\User;
 use SuplaBundle\Enums\AuthenticationFailureReason;
 use SuplaBundle\Model\Audit\FailedAuthAttemptsUserBlocker;
 use SuplaBundle\Model\LoginChallengeTokenService;
@@ -109,6 +110,12 @@ class TokenController extends RestController {
                     Response::HTTP_TOO_MANY_REQUESTS
                 );
             }
+            if ($user && $this->isUserScopeBlocked($user, ['www', 'api'])) {
+                return $this->view(
+                    $this->buildBlockedPayload($request, $user, ['www', 'api']),
+                    Response::HTTP_LOCKED
+                );
+            }
             if ($user && !$user->isEnabled()) {
                 return $this->view(
                     ['error' => 'disabled', 'error_description' => 'Your account has not been confirmed.'],
@@ -163,6 +170,12 @@ class TokenController extends RestController {
                 Response::HTTP_TOO_MANY_REQUESTS
             );
         }
+        if ($this->isUserScopeBlocked($user, ['www', 'api'])) {
+            return $this->view(
+                $this->buildBlockedPayload($request, $user, ['www', 'api']),
+                Response::HTTP_LOCKED
+            );
+        }
 
         $valid = $code
             ? $this->twoFactorService->verifyCode($user, $code)
@@ -212,6 +225,11 @@ class TokenController extends RestController {
                     ['error' => 'locked', 'error_description' => 'Your account has been blocked for a while.'],
                     Response::HTTP_TOO_MANY_REQUESTS
                 );
+            } elseif ($user && $this->isUserScopeBlocked($user, ['www', 'api'])) {
+                return $this->view(
+                    $this->buildBlockedPayload($request, $user, ['www', 'api']),
+                    Response::HTTP_LOCKED
+                );
             } elseif ($user && !$user->isEnabled()) {
                 return $this->view(
                     ['error' => 'disabled', 'error_description' => 'Your account has not been confirmed.'],
@@ -245,5 +263,104 @@ class TokenController extends RestController {
             'scope' => $accessToken->getScope(),
             'expiresAt' => $accessToken->getExpiresAt(),
         ]);
+    }
+
+    private function isUserScopeBlocked(User $user, array $scopes): bool {
+        $profile = $user->getPreference('admin.blockProfile', null);
+        if (is_array($profile)) {
+            $until = (int)($profile['until'] ?? 0);
+            $blockedScopes = array_values(array_intersect(['www', 'api', 'mqtt'], (array)($profile['scopes'] ?? [])));
+            if ($until > time() && count(array_intersect($scopes, $blockedScopes)) > 0) {
+                return true;
+            }
+        }
+        $schedule = $user->getPreference('admin.blockSchedule', null);
+        if (is_array($schedule) && $this->isScheduleBlockedNow($schedule, $scopes)) {
+            return true;
+        }
+        $until = (int)($user->getPreference('admin.blockedUntil', 0) ?? 0);
+        return $until > time();
+    }
+
+    private function buildBlockedDescription(Request $request, User $user, array $scopes): string {
+        $profile = $user->getPreference('admin.blockProfile', null);
+        $until = (int)($user->getPreference('admin.blockedUntil', 0) ?? 0);
+        $reason = '';
+        if (is_array($profile) && count(array_intersect($scopes, (array)($profile['scopes'] ?? []))) > 0) {
+            $until = (int)($profile['until'] ?? 0);
+            $reason = trim((string)($profile['reason'] ?? ''));
+        } else {
+            $schedule = $user->getPreference('admin.blockSchedule', null);
+            if (is_array($schedule) && $this->isScheduleBlockedNow($schedule, $scopes)) {
+                $until = $this->getScheduleUntil($schedule);
+                $reason = trim((string)($schedule['reason'] ?? ''));
+            }
+        }
+        $lang = strtolower(substr((string)$request->headers->get('Accept-Language', 'en'), 0, 2));
+        $isPolish = $lang === 'pl';
+        $message = $isPolish ? 'Twoje konto zostało tymczasowo zablokowane' : 'Your account is temporarily blocked';
+        if ($until > 0) {
+            $message .= $isPolish ? ' do ' . date('Y-m-d H:i', $until) : ' until ' . date('Y-m-d H:i', $until);
+        }
+        $message .= '.';
+        if ($reason !== '') {
+            $message .= $isPolish ? ' Powód: ' . $reason : ' Reason: ' . $reason;
+        }
+        return $message;
+    }
+
+    private function buildBlockedPayload(Request $request, User $user, array $scopes): array {
+        $profile = $user->getPreference('admin.blockProfile', null);
+        $until = (int)($user->getPreference('admin.blockedUntil', 0) ?? 0);
+        $reason = '';
+        if (is_array($profile) && count(array_intersect($scopes, (array)($profile['scopes'] ?? []))) > 0) {
+            $until = (int)($profile['until'] ?? 0);
+            $reason = trim((string)($profile['reason'] ?? ''));
+        } else {
+            $schedule = $user->getPreference('admin.blockSchedule', null);
+            if (is_array($schedule) && $this->isScheduleBlockedNow($schedule, $scopes)) {
+                $until = $this->getScheduleUntil($schedule);
+                $reason = trim((string)($schedule['reason'] ?? ''));
+            }
+        }
+        return [
+            'error' => 'locked',
+            'error_description' => $this->buildBlockedDescription($request, $user, $scopes),
+            'blocked_until' => $until > 0 ? date('Y-m-d H:i', $until) : null,
+            'blocked_reason' => $reason !== '' ? $reason : null,
+        ];
+    }
+
+    private function isScheduleBlockedNow(array $schedule, array $scopes): bool {
+        $days = array_map('intval', (array)($schedule['days'] ?? []));
+        $from = (string)($schedule['from'] ?? '');
+        $to = (string)($schedule['to'] ?? '');
+        $scheduleScopes = array_values(array_intersect(['www', 'api', 'mqtt'], (array)($schedule['scopes'] ?? [])));
+        if (!$days || !preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $from) || !preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $to) || !count(array_intersect($scopes, $scheduleScopes))) {
+            return false;
+        }
+        $day = (int)date('N');
+        if (!in_array($day, $days, true)) {
+            return false;
+        }
+        [$fromHour, $fromMinute] = array_map('intval', explode(':', $from));
+        [$toHour, $toMinute] = array_map('intval', explode(':', $to));
+        $nowMinutes = ((int)date('H')) * 60 + (int)date('i');
+        $fromMinutes = $fromHour * 60 + $fromMinute;
+        $toMinutes = $toHour * 60 + $toMinute;
+        if ($fromMinutes < $toMinutes) {
+            return $nowMinutes >= $fromMinutes && $nowMinutes < $toMinutes;
+        }
+        return $nowMinutes >= $fromMinutes || $nowMinutes < $toMinutes;
+    }
+
+    private function getScheduleUntil(array $schedule): int {
+        [$toHour, $toMinute] = array_map('intval', explode(':', (string)$schedule['to']));
+        $until = (new \DateTimeImmutable('now'))->setTime($toHour, $toMinute);
+        [$fromHour, $fromMinute] = array_map('intval', explode(':', (string)$schedule['from']));
+        if (($fromHour * 60 + $fromMinute) >= ($toHour * 60 + $toMinute) && (((int)date('H')) * 60 + (int)date('i')) >= ($fromHour * 60 + $fromMinute)) {
+            $until = $until->modify('+1 day');
+        }
+        return $until->getTimestamp();
     }
 }

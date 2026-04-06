@@ -724,6 +724,9 @@ const De = P(Fe, [
                 limits: void 0,
                 relationsCount: void 0,
                 apiRateStatus: void 0,
+                pendingLimits: null,
+                accountBlocking: null,
+                accountLimitsSelfUpdateLocked: !1,
                 currentTab: "features",
                 draftLimits: {},
                 draftApiRateLimit: ""
@@ -734,12 +737,40 @@ const De = P(Fe, [
         },
         methods: {
             handleConfirm() {
-                this.currentTab === "edit" && this.canEditLimits ? this.saveLimits() : this.$emit("confirm")
+                if (this.currentTab === "edit") {
+                    if (this.isBlocked) {
+                        Y(this.blockedMessage);
+                        return;
+                    }
+                    if (this.isLimitsLocked) {
+                        Y(this.limitsLockedMessage);
+                        return;
+                    }
+                    if (this.hasPendingLimits) {
+                        Y(this.pendingMessage);
+                        return;
+                    }
+                    this.canEditLimits ? this.saveLimits() : this.$emit("confirm");
+                } else {
+                    this.$emit("confirm");
+                }
             },
             handleCancel() {
                 this.currentTab === "edit" ? this.closeEditor() : this.$emit("confirm")
             },
             openEditor() {
+                if (this.isBlocked) {
+                    Y(this.blockedMessage);
+                    return;
+                }
+                if (this.isLimitsLocked) {
+                    Y(this.limitsLockedMessage);
+                    return;
+                }
+                if (this.hasPendingLimits) {
+                    Y(this.pendingMessage);
+                    return;
+                }
                 this.resetDraft(), this.currentTab = "edit"
             },
             closeEditor() {
@@ -752,7 +783,7 @@ const De = P(Fe, [
                 this.limits = {
                     ...a.limits,
                     apiRateLimit: a.apiRateLimit
-                }, this.relationsCount = a.relationsCount, this.apiRateStatus = this.limits.apiRateLimit ? {
+                }, this.relationsCount = a.relationsCount, this.pendingLimits = a.pendingLimits || null, this.accountBlocking = a.accountBlocking || null, this.accountLimitsSelfUpdateLocked = !!a.accountLimitsSelfUpdateLocked, this.apiRateStatus = this.limits.apiRateLimit ? {
                     requests: this.limits.apiRateLimit.rule.limit - this.limits.apiRateLimit.status.remaining,
                     limit: this.limits.apiRateLimit.rule.limit,
                     seconds: this.limits.apiRateLimit.rule.period
@@ -772,6 +803,18 @@ const De = P(Fe, [
             },
             saveLimits() {
                 if (this.fetching || this.saving) return;
+                if (this.isBlocked) {
+                    Y(this.blockedMessage);
+                    return;
+                }
+                if (this.isLimitsLocked) {
+                    Y(this.limitsLockedMessage);
+                    return;
+                }
+                if (this.hasPendingLimits) {
+                    Y(this.pendingMessage);
+                    return;
+                }
                 const a = {};
                 for (const {
                         field: s
@@ -794,6 +837,53 @@ const De = P(Fe, [
             }
         },
         computed: {
+            uiLang() {
+                const a = (this.$i18n && this.$i18n.locale) ? String(this.$i18n.locale) : "";
+                return a.toLowerCase().startsWith("pl") ? "pl" : "en"
+            },
+            hasPendingLimits() {
+                return !!this.pendingLimits
+            },
+            isLimitsLocked() {
+                return !!this.accountLimitsSelfUpdateLocked
+            },
+            isBlocked() {
+                return !!(this.accountBlocking && this.accountBlocking.blocked)
+            },
+            blockedMessage() {
+                const a = this.accountBlocking && this.accountBlocking.blockedUntil ? new Date(this.accountBlocking.blockedUntil * 1e3) : null;
+                const s = a ? a.toLocaleString() : "";
+                const f = this.accountBlocking && this.accountBlocking.reason ? String(this.accountBlocking.reason) : "";
+                const w = this.accountBlocking && Array.isArray(this.accountBlocking.scopes) ? this.accountBlocking.scopes.join(", ").toUpperCase() : "";
+                return this.uiLang === "pl" ? `Twoje konto jest zablokowane${s ? " do " + s : ""}${w ? " (" + w + ")" : ""}${f ? ". Powód: " + f : ""}.` : `Your account is blocked${s ? " until " + s : ""}${w ? " (" + w + ")" : ""}${f ? ". Reason: " + f : ""}.`
+            },
+            limitsLockedMessage() {
+                return this.uiLang === "pl" ? "Zmiana limitow jest zablokowana przez administratora." : "Changing limits is locked by an administrator."
+            },
+            pendingMessage() {
+                const a = this.pendingLimits && this.pendingLimits.requestedAt ? new Date(this.pendingLimits.requestedAt * 1e3) : null;
+                const s = a ? a.toLocaleString() : "";
+                let f = this.uiLang === "pl" ? `Twoje zmiany limitow oczekuja na akceptacje administratora${s ? " (zgloszone: " + s + ")" : ""}.` : `Your limit changes are pending admin approval${s ? " (requested: " + s + ")" : ""}.`;
+                const w = this.pendingLimits || {};
+                const r = w.limits && typeof w.limits == "object" ? w.limits : null;
+                if (r) {
+                    const A = this.editableLimitFields || [];
+                    const h = [];
+                    for (const u of Object.keys(r)) {
+                        const e = A.find(n => n.field === u);
+                        const n = e ? this.$t(e.label) : u;
+                        const t = r[u];
+                        const o = this.readLimitValue(u);
+                        h.push(`${n}: ${t} (aktualnie: ${o})`);
+                    }
+                    if (h.length) f += "\n\n" + (this.uiLang === "pl" ? "Oczekujace wartosci:" : "Pending values:") + "\n" + h.join("\n");
+                }
+                if ("apiRateLimit" in w) {
+                    const A = String(w.apiRateLimit || "").trim();
+                    f += "\n" + (this.uiLang === "pl" ? "API rate limit: " : "API rate limit: ") + (A === "" ? (this.uiLang === "pl" ? "(domyslny)" : "(default)") : A);
+                }
+                return f
+            },
             apiRateStatusReset() {
                 if (this.apiRateStatus) return T.fromSeconds(this.limits.apiRateLimit.status.reset).toLocaleString(T.DATETIME_SHORT_WITH_SECONDS)
             },
@@ -903,6 +993,21 @@ const De = P(Fe, [
     ctt = {
         key: 0,
         class: "alert alert-info my-3"
+    },
+    ptt = {
+        key: 1,
+        class: "alert alert-danger my-3"
+    },
+    htt = {
+        key: 2,
+        class: "alert alert-warning my-3"
+    },
+    ytt = {
+        key: 3,
+        class: "alert alert-info my-3",
+        style: {
+            "white-space": "pre-wrap"
+        }
     },
     utt = {
         class: "mb-2"
@@ -1082,7 +1187,7 @@ function ftt(a, s, f, w, r, A) {
                 class: "help-block"
             }, "Leave empty to use the default limit.", -1))])])])])) : b("", !0)])) : b("", !0)], void 0, !0),
             _: 1
-        }, 8, ["loading"]), !A.canEditLimits && !a.frontendConfigStore.config.actAsBrokerCloud && r.currentTab !== "data" ? (m(), y("div", ctt, [i("p", utt, [v(e, {
+        }, 8, ["loading"]), A.isBlocked ? (m(), y("div", ptt, c(A.blockedMessage), 1)) : b("", !0), A.isLimitsLocked ? (m(), y("div", htt, c(A.limitsLockedMessage), 1)) : b("", !0), A.hasPendingLimits ? (m(), y("div", ytt, c(A.pendingMessage), 1)) : b("", !0), !A.canEditLimits && !a.frontendConfigStore.config.actAsBrokerCloud && r.currentTab !== "data" ? (m(), y("div", ctt, [i("p", utt, [v(e, {
             keypath: "Use the {0} server command to change this account's limits. For example:"
         }, {
             default: E(() => [...s[11] || (s[11] = [i("code", null, "supla:user:change-limits", -1)])], void 0, !0),

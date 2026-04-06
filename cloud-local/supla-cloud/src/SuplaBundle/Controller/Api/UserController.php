@@ -168,6 +168,9 @@ class UserController extends RestController {
         'virtualChannels' => 'limitVirtualChannels',
     ];
 
+    private const PREF_PENDING_LIMITS = 'admin.pendingLimits';
+    private const PREF_LIMITS_SELF_UPDATE_LOCKED = 'admin.limitsSelfUpdateLocked';
+
     public function __construct(
         UserManager $userManager,
         AuditEntryRepository $auditEntryRepository,
@@ -364,26 +367,33 @@ class UserController extends RestController {
 
     private function changeCurrentUserLimits(User $user, array $data): void {
         Assertion::true($this->accountLimitsEditingEnabled, 'Account limits editing is disabled.');
+        Assertion::false((bool)$user->getPreference(self::PREF_LIMITS_SELF_UPDATE_LOCKED, false), 'Account limits self-update is locked.');
         $limits = $data['limits'] ?? [];
         Assertion::isArray($limits, 'Invalid limits payload.');
+        $pendingLimits = [];
         foreach ($limits as $publicField => $value) {
             Assertion::keyExists(self::CURRENT_USER_LIMIT_FIELDS, $publicField, 'Unknown limit field: ' . $publicField);
             Assertion::integerish($value, 'Invalid limit value for ' . $publicField);
             $value = intval($value);
             Assertion::greaterOrEqualThan($value, 0, 'Limit value must be greater than or equal to 0.');
-            EntityUtils::setField($user, self::CURRENT_USER_LIMIT_FIELDS[$publicField], $value);
+            $pendingLimits[$publicField] = $value;
         }
+        $pending = [
+            'requestedAt' => time(),
+            'limits' => $pendingLimits,
+        ];
         if (array_key_exists('apiRateLimit', $data)) {
             $newRule = trim(strval($data['apiRateLimit'] ?? ''));
             if ($newRule === '' || $newRule === (string)$this->defaultUserApiRateLimit) {
-                $user->setApiRateLimit(null);
+                $pending['apiRateLimit'] = '';
             } else {
                 $rule = new ApiRateLimitRule($newRule);
                 Assertion::true($rule->isValid(), 'Invalid API rate limit rule. Format: limit/seconds');
-                $user->setApiRateLimit($rule);
+                $pending['apiRateLimit'] = $newRule;
             }
-            $this->apiRateLimitStorage->clearUserLimit($user);
         }
+        // Store requested changes to be approved by an admin.
+        $user->setPreference(self::PREF_PENDING_LIMITS, $pending);
     }
 
     /**
@@ -479,7 +489,7 @@ class UserController extends RestController {
             ->validate($newPassword);
         $user->setPlainPassword($newPassword);
 
-        $locale = ($data['locale'] ?? '') ?: 'en';
+        $locale = ($data['locale'] ?? '') ?: 'pl';
         Assertion::inArray($locale, $this->availableLanguages, 'Language is not available'); // i18n
         $user->setLocale($locale);
 
@@ -501,10 +511,19 @@ class UserController extends RestController {
         }
         $this->userManager->create($user);
 
-        $this->userManager->sendConfirmationEmailMessage($user);
+        $activationMode = (string)($data['activationMode'] ?? 'email');
+        if (!in_array($activationMode, ['email', 'admin'], true)) {
+            throw new InvalidArgumentException('Invalid activation mode.');
+        }
+        $emailSent = false;
+        if ($activationMode === 'email') {
+            $this->userManager->sendConfirmationEmailMessage($user);
+            $emailSent = true;
+        }
 
         $view = $this->view($user, Response::HTTP_CREATED);
-        $view->setHeader('SUPLA-Email-Sent', 'true');
+        $view->setHeader('SUPLA-Email-Sent', $emailSent ? 'true' : 'false');
+        $view->setHeader('SUPLA-Activation-Mode', $activationMode);
         return $view;
     }
 

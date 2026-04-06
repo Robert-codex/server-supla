@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+umask 077
 
 apache_server_name="${APACHE_SERVER_NAME:-${CLOUD_DOMAIN:-localhost}}"
 db_host="${DB_HOST:-supla-db}"
@@ -73,7 +74,7 @@ parameters:
   recaptcha_enabled: ${RECAPTCHA_ENABLED:-false}
   recaptcha_site_key: ${RECAPTCHA_PUBLIC_KEY:-~}
   recaptcha_secret: ${RECAPTCHA_PRIVATE_KEY:-~}
-  locale: en
+  locale: pl
   secret: ${SECRET:-DEFAULT_SECRET_IS_BAD_IDEA}
   cors_allow_origin_regex:
     - supla2.+
@@ -122,6 +123,8 @@ if [ ${SUPLA_PROTOCOL:-https} = "https" ]; then
     mv web/.htaccess-tmp web/.htaccess
   fi
 fi
+chown www-data:www-data web/.htaccess 2>/dev/null || true
+chmod 644 web/.htaccess 2>/dev/null || true
 
 export WAIT_DB_HOST="${db_host}"
 export WAIT_DB_PORT="${db_port}"
@@ -145,6 +148,33 @@ php bin/console supla:initialize
 php bin/console cache:warmup
 chown -hR www-data:www-data var
 php bin/console supla:create-confirmed-user $FIRST_USER_EMAIL $FIRST_USER_PASSWORD --no-interaction --if-not-exists
+
+# Initialize admin panel account storage (file-based) from env on first run.
+admin_store="${ADMIN_PANEL_STORAGE_FILE:-var/admin_panel.json}"
+admin_audit="${ADMIN_PANEL_AUDIT_LOG_FILE:-var/admin_panel_audit.log}"
+admin_attempts="${ADMIN_PANEL_ATTEMPTS_FILE:-var/admin_panel_attempts.json}"
+if [ "${ADMIN_PANEL_USER}" != "" ] && [ "${ADMIN_PANEL_PASSWORD_HASH}" != "" ]; then
+  if [ ! -s "${admin_store}" ]; then
+    php -r '
+      $file = getenv("ADMIN_PANEL_STORAGE_FILE") ?: "var/admin_panel.json";
+      $data = [
+        "username" => (string)getenv("ADMIN_PANEL_USER"),
+        "passwordHash" => (string)getenv("ADMIN_PANEL_PASSWORD_HASH"),
+        "twoFactorEnabled" => false,
+        "twoFactorSecret" => null,
+        "twoFactorPendingSecret" => null,
+        "twoFactorRecoveryCodes" => [],
+      ];
+      @mkdir(dirname($file), 0700, true);
+      file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+      @chmod($file, 0600);
+    ';
+  fi
+fi
+touch "${admin_audit}" || true
+touch "${admin_attempts}" || true
+chown -hR www-data:www-data "${admin_store}" "${admin_audit}" "${admin_attempts}" 2>/dev/null || true
+chmod 600 "${admin_store}" "${admin_audit}" "${admin_attempts}" 2>/dev/null || true
 
 if [ "${1#-}" != "$1" ]; then
   set -- apache2-foreground "$@"
