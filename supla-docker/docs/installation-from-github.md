@@ -60,8 +60,23 @@ If you want to use a private MQTT broker later, also configure:
 - `MQTT_BROKER_USERNAME`
 - `MQTT_BROKER_PASSWORD`
 - `MQTT_BROKER_CLIENT_ID`
+- `ADMIN_PANEL_USER`
+- `ADMIN_PANEL_PASSWORD_HASH`
 
 The MQTT overlay setup is documented in [mqtt-private-broker.md](mqtt-private-broker.md).
+
+## 4a. Admin panel defaults
+
+The clean repository ships with a separate local admin panel account:
+
+- login: `admin`
+- password: `admin`
+
+After the first login, change the password immediately in:
+
+```text
+/admin/account
+```
 
 ## 5. Start the stack
 
@@ -102,6 +117,11 @@ https://YOUR_DOMAIN_OR_IP/
 ```
 
 After the first boot you can create the initial account in the web UI.
+The admin panel is available under:
+
+```text
+https://YOUR_DOMAIN_OR_IP/admin/login
+```
 
 ## 8. Create a confirmed user from CLI if needed
 

@@ -7,6 +7,9 @@ __pycache__/
 *.tar.gz
 var/backups/
 var/cloud-logs/
+var/admin_panel.json
+var/admin_panel_audit.log
+var/admin_panel_attempts.json
 var/mosquitto/data/
 var/mosquitto/log/
 var/mysql/

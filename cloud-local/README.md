@@ -12,6 +12,12 @@ Cel:
 - trzymać potrzebne pliki runtime wewnątrz repo `ServerSupla`,
 - nie uzależniać wdrożenia od osobnego checkoutu `supla-cloud`.
 
+Domyślny wariant repo do publikacji nie zawiera lokalnych sekretów:
+
+- lokalne pliki `.env` są ignorowane przez git,
+- runtime pliki admina (`admin_panel.json`, `admin_panel_audit.log`, `admin_panel_attempts.json`) są ignorowane przez git,
+- domyślne konto panelu admina jest definiowane przez `supla-docker/.env.default`.
+
 `cloud-local/supla-cloud/web/dist/` zawiera zbudowany frontend, a `cloud-local/supla-cloud/src/` i `app/config/` zawierają nadpisywane pliki backendu.
 
 Frontend source upstream nie jest trzymany w tym repo. Z tego powodu poprawki GUI w `web/dist/` są utrzymywane jako powtarzalny overlay binarny, a nie jako normalny build Vite/Vue.
@@ -39,7 +45,9 @@ Skrypt:
   - `login-page-CfxWV-Jq-upstream.js`
   - `login-form-C8Lf4buW-upstream.js`
   - `resend-account-activation-link-DP8hDyU_-upstream.js`
+  - `two-factor-authentication-DQochOGS-upstream.js`
 - generuje docelowy lancuch assetow `*-edgefix.js` dla sciezki logowania,
+- odtwarza lokalny overlay 2FA z polskimi etykietami i kodem QR do konfiguracji,
 - przepina `index.html`, entry bundle i kompatybilnosciowe wrappery na wariant `edgefix`,
 - usuwa tymczasowe pliki diagnostyczne `refsfix*`.
 

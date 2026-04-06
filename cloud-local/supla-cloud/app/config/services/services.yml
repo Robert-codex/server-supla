@@ -173,6 +173,18 @@ services:
 
   SuplaBundle\Auth\UserProvider: ~
   SuplaBundle\Auth\SuplaAccessTokenManager: ~
+  SuplaBundle\Security\AdminPanelAccountStore: ~
+  SuplaBundle\Security\AdminPanelUserProvider: ~
+  SuplaBundle\EventListener\AdminPanelTwoFactorEnforcer:
+    tags:
+      - {name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
+  SuplaBundle\EventListener\AdminPanelBruteForceListener:
+    tags:
+      - {name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 20}
+  SuplaBundle\EventListener\AdminPanelAuthAuditListener:
+    tags:
+      - {name: kernel.event_listener, event: security.authentication.failure, method: onInteractiveAuthenticationFailure}
+      - {name: kernel.event_listener, event: security.interactive_login, method: onInteractiveAuthenticationSuccess}
   SuplaBundle\Auth\UserLoginAttemptListener:
     tags:
       - {name: kernel.event_listener, event: security.authentication.failure, method: onInteractiveAuthenticationFailure}
@@ -210,6 +222,10 @@ services:
       $maintenanceMode: "%supla.maintenance_mode%"
     tags:
       - {name: kernel.event_listener, event: kernel.controller, method: onKernelController}
+
+  SuplaBundle\EventListener\BlockedUserRequestListener:
+    tags:
+      - {name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: 0}
 
   SuplaBundle\EventListener\ResponseContentLengthListener:
     tags: ['kernel.event_listener']
