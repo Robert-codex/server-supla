@@ -83,10 +83,10 @@ class UserSerializer extends AbstractSerializer implements NormalizerAwareInterf
             ];
             $normalized['limits']['pushNotificationsPerHour'] = $this->suplaServer->getPushNotificationLimit($user);
         }
-        if (ApiVersions::V2_4()->isRequestedEqualOrGreaterThan($context)) {
-            if (!isset($normalized['relationsCount']) && $this->isSerializationGroupRequested('user.relationsCount', $context)) {
-                $normalized['relationsCount'] = $this->userRepository->find($user->getId())->getRelationsCount();
-            }
+        if (!isset($normalized['relationsCount']) && $this->isSerializationGroupRequested('user.relationsCount', $context)) {
+            // The account limits modal expects relationsCount to exist even when the
+            // request is made without an explicit API version suffix.
+            $normalized['relationsCount'] = $this->userRepository->find($user->getId())->getRelationsCount();
         }
         if ($this->isSerializationGroupRequested('sun', $context)) {
             $time = $this->timeProvider->getTimestamp();

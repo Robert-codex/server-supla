@@ -3,6 +3,7 @@
 namespace SuplaBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use SuplaBundle\Mailer\SuplaMailer;
 use SuplaBundle\Security\AdminPanelAccountStore;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -12,8 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Mime\Email;
 
 class AdminAuthController extends Controller {
+    use AdminUiTrait;
+
     private const LOCALE_COOKIE = 'supla_admin_locale';
 
     /**
@@ -21,6 +25,18 @@ class AdminAuthController extends Controller {
      */
     public function loginAction(Request $request, AdminPanelAccountStore $store): Response {
         if ($this->getUser()) {
+            $session = $request->getSession();
+            $targetPath = $session ? (string)$session->get('_security.admin.target_path', '') : '';
+            if ($targetPath !== '' && $targetPath !== '/admin/login') {
+                return $this->redirect($targetPath);
+            }
+            $referer = (string)$request->headers->get('referer', '');
+            if ($referer !== '') {
+                $refererPath = parse_url($referer, PHP_URL_PATH);
+                if (is_string($refererPath) && str_starts_with($refererPath, '/admin/') && $refererPath !== '/admin/login') {
+                    return $this->redirect($refererPath . (parse_url($referer, PHP_URL_QUERY) ? ('?' . parse_url($referer, PHP_URL_QUERY)) : ''));
+                }
+            }
             return $this->redirect('/admin/dashboard');
         }
         if ($request->query->has('lang')) {
@@ -59,42 +75,55 @@ class AdminAuthController extends Controller {
         $lastLogin = $this->findLastSuccessfulLogin($store, $lastUsername);
         $escape = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-        $html = '<!doctype html><html><head><meta charset="utf-8" />'
-            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('login_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7f8;min-height:100vh;display:flex;align-items:center;justify-content:center;}'
-            . '.card{width:min(440px,92vw);background:#fff;border:1px solid #e2e2e2;border-radius:14px;padding:18px 18px 16px 18px;box-shadow:0 6px 20px rgba(0,0,0,.06);}'
-            . '.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}'
-            . 'h1{font-size:18px;margin:0 0 6px 0;}'
-            . 'label{display:block;font-size:12px;color:#444;margin:10px 0 6px 0;}'
-            . 'input,button{font:inherit;padding:10px 12px;border:1px solid #ccc;border-radius:10px;width:100%;box-sizing:border-box;}'
-            . '.password-row{position:relative;}'
-            . '.toggle-pass{position:absolute;right:8px;top:8px;width:auto;padding:6px 8px;font-size:12px;border-radius:8px;background:#fff;color:#333;}'
-            . 'button.submit{margin-top:14px;background:#0b7a3a;border-color:#0b7a3a;color:#fff;cursor:pointer;}'
-            . '.err{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;padding:10px 12px;border-radius:10px;margin:10px 0 0 0;font-size:13px;}'
-            . '.muted{margin-top:12px;color:#666;font-size:12px;line-height:1.4;}'
-            . '.hint{margin-top:10px;background:#fafafa;border:1px solid #eee;padding:10px 12px;border-radius:10px;font-size:12px;color:#555;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . '</style></head><body><div class="card">'
-            . '<div class="top"><div><h1>SUPLA Admin</h1></div><div><a href="/admin/login?lang=pl"' . ($locale === 'pl' ? ' style="font-weight:700;"' : '') . '>PL</a> | <a href="/admin/login?lang=en"' . ($locale === 'en' ? ' style="font-weight:700;"' : '') . '>EN</a></div></div>'
-            . '<div class="muted" style="margin-top:0;">' . $escape($tr('separate_account')) . '</div>'
+        $html = $this->adminUiPageOpen(
+            $escape($tr('login_title')),
+            'body.auth-shell{display:flex;align-items:center;justify-content:center;padding:24px;}.auth-shell{background:radial-gradient(circle at top left,rgba(11,122,58,.08) 0,rgba(35,166,91,.05) 30%,transparent 60%),radial-gradient(circle at bottom right,rgba(11,122,58,.06) 0,transparent 48%),linear-gradient(180deg,#f5faf7 0,#eef3f6 100%);}.auth-shell .auth-card{width:min(980px,96vw);display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden;border-radius:24px;border:1px solid rgba(223,229,234,.95);background:rgba(255,255,255,.86);box-shadow:0 20px 60px rgba(16,24,40,.12);backdrop-filter:blur(14px);}.auth-shell .auth-hero{padding:30px;background:linear-gradient(160deg,var(--ui-accent) 0,var(--ui-accent-alt) 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:22px;}.auth-shell .auth-hero-top{display:flex;justify-content:space-between;gap:12px;align-items:center;}.auth-shell .auth-hero-logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-0.02em;font-size:16px;text-decoration:none;color:#fff;}.auth-shell .auth-hero-mark{width:36px;height:36px;border-radius:12px;background:rgba(255,255,255,.18);display:inline-flex;align-items:center;justify-content:center;font-size:18px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}.auth-shell .auth-hero-copy{max-width:340px;}.auth-shell .auth-hero-copy h1{font-size:34px;line-height:1.02;margin:0 0 12px 0;letter-spacing:-0.04em;color:#fff;}.auth-shell .auth-hero-copy p{margin:0;color:rgba(255,255,255,.88);line-height:1.55;font-size:14px;}.auth-shell .auth-hero-footer{display:grid;gap:10px;}.auth-shell .auth-hero-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font-size:12px;line-height:1;border:1px solid rgba(255,255,255,.16);}.auth-shell .auth-form{padding:30px 30px 26px 30px;display:flex;flex-direction:column;justify-content:center;}.auth-shell .auth-form h2{margin:0 0 8px 0;font-size:22px;letter-spacing:-0.03em;}.auth-shell .auth-form .muted{margin:0 0 14px 0;}.auth-shell .auth-form form{display:grid;gap:10px;margin-top:10px;}.auth-shell .auth-form label{font-size:12px;font-weight:700;color:#45515c;margin-bottom:-4px;}.auth-shell .auth-form input{width:100%;height:42px;}.auth-shell .password-row{display:flex;gap:8px;align-items:center;}.auth-shell .password-row input{flex:1;}.auth-shell .toggle-pass{white-space:nowrap;background:#f6f8f9;color:#18212a;border-color:#dfe5ea;}.auth-shell .submit{width:100%;height:44px;margin-top:4px;font-size:14px;font-weight:700;}.auth-shell .auth-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px;}.auth-shell .auth-links .muted,.auth-shell .auth-links a{font-size:12px;}.auth-shell .auth-meta{margin-top:14px;padding-top:12px;border-top:1px solid #edf0f2;color:#5b6570;font-size:12px;line-height:1.5;}.auth-shell .auth-alert{margin-top:12px;}.auth-shell .auth-lang{display:flex;gap:8px;align-items:center;}.auth-shell .auth-lang a{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:30px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.16);color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.18);}.auth-shell .auth-lang a.active{background:#fff;color:var(--ui-accent);font-weight:800;}.auth-shell .auth-lang a:hover{text-decoration:none;filter:brightness(1.03);}.auth-shell .err{margin-top:12px;padding:11px 12px;border-radius:12px;background:var(--ui-danger-soft);border:1px solid var(--ui-danger-border);color:var(--ui-danger);font-size:13px;}.auth-shell .hint{margin-top:10px;color:#5b6570;font-size:12px;}.auth-shell .auth-note{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:#f7fbf8;border:1px solid #d7eadf;color:#2b3a32;font-size:12px;line-height:1.45;}.auth-shell .auth-note strong{color:var(--ui-accent);}.auth-shell .auth-hero-stats{display:grid;gap:10px;}.auth-shell .auth-hero-stat{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);font-size:12px;}.auth-shell .auth-hero-stat b{font-size:13px;}@media (max-width:900px){.auth-shell .auth-card{grid-template-columns:1fr;}.auth-shell .auth-hero{padding:24px;}.auth-shell .auth-form{padding:24px;}}@media (max-width:640px){body.auth-shell{padding:10px;}.auth-shell .auth-card{border-radius:18px;}.auth-shell .auth-hero{padding:18px;gap:16px;}.auth-shell .auth-hero-top{align-items:flex-start;}.auth-shell .auth-hero-copy h1{font-size:26px;line-height:1.05;margin-bottom:10px;}.auth-shell .auth-hero-copy p{font-size:13px;}.auth-shell .auth-hero-footer{gap:8px;}.auth-shell .auth-hero-pill{padding:8px 10px;font-size:11px;}.auth-shell .auth-hero-stats{display:none;}.auth-shell .auth-form{padding:18px;}.auth-shell .auth-form h2{font-size:20px;}.auth-shell .auth-note{padding:9px 10px;font-size:11px;}.auth-shell .auth-links{flex-direction:column;align-items:flex-start;gap:8px;}.auth-shell .auth-links .hint{margin-top:0;}.auth-shell .password-row{flex-direction:column;align-items:stretch;}.auth-shell .toggle-pass{width:100%;}}'
+            ,
+            'ui-shell auth-shell'
+        );
+        $html .= '<div class="auth-card">'
+            . '<section class="auth-hero">'
+            . '<div class="auth-hero-top">'
+            . '<a class="auth-hero-logo" href="/admin/login" aria-label="SUPLA Admin">'
+            . '<span class="auth-hero-mark">S</span>'
+            . '<span>SUPLA Admin</span>'
+            . '</a>'
+            . '<div class="auth-lang"><a href="/admin/login?lang=pl"' . ($locale === 'pl' ? ' class="active"' : '') . '>PL</a><a href="/admin/login?lang=en"' . ($locale === 'en' ? ' class="active"' : '') . '>EN</a></div>'
+            . '</div>'
+            . '<div class="auth-hero-copy">'
+            . '<h1>' . $escape($tr('login_title')) . '</h1>'
+            . '<p>' . $escape($tr('separate_account')) . '</p>'
+            . '</div>'
+            . '<div class="auth-hero-footer">'
+            . '<div class="auth-hero-pill">Panel administracyjny</div>'
+            . '<div class="auth-hero-pill">2FA · Password reset · Audit log</div>'
+            . '<div class="auth-hero-stats">'
+            . '<div class="auth-hero-stat"><span>Last login</span><b>' . $escape($lastLogin !== '' ? $lastLogin : '—') . '</b></div>'
+            . '<div class="auth-hero-stat"><span>Status</span><b>' . $escape($error !== '' ? $tr('login_failed') : 'Ready') . '</b></div>'
+            . '</div>'
+            . '</div>'
+            . '</section>'
+            . '<section class="auth-form">'
+            . '<h2>' . $escape($tr('sign_in')) . '</h2>'
+            . '<div class="muted">' . $escape($tr('separate_account')) . '</div>'
+            . '<div class="auth-note"><strong>Tip:</strong><span>' . $escape($tr('login_tip')) . '</span></div>'
             . '<form method="post" action="/admin/login">'
             . '<input type="hidden" name="_csrf_token" value="' . $escape($csrfToken) . '" />'
             . '<label>' . $escape($tr('username')) . '</label><input name="_username" type="text" autocomplete="username" value="' . $escape($lastUsername) . '" required />'
             . '<label>' . $escape($tr('password')) . '</label><div class="password-row"><input id="admin-password" name="_password" type="password" autocomplete="current-password" required /><button type="button" class="toggle-pass" data-target="admin-password">' . $escape($tr('show_password')) . '</button></div>'
             . '<button type="submit" class="submit">' . $escape($tr('sign_in')) . '</button>'
             . '</form>'
-            . '<div class="muted"><a href="/admin/forgot-password">' . $escape($tr('forgot_password')) . '</a></div>';
-
+            . '<div class="auth-links">'
+            . '<div class="muted"><a href="/admin/forgot-password">' . $escape($tr('forgot_password')) . '</a></div>'
+            . '<div class="hint">' . $escape($error !== '' ? $error : ($lastLogin !== '' ? sprintf($tr('last_login'), $lastLogin) : '')) . '</div>'
+            . '</div>';
         if ($error !== '') {
-            $html .= '<div class="err">' . $escape($error) . '</div>';
-        }
-        if ($lastLogin !== '') {
-            $html .= '<div class="hint">' . $escape(sprintf($tr('last_login'), $lastLogin)) . '</div>';
+            $html .= '<div class="err auth-alert">' . $escape($error) . '</div>';
         }
         $html .= '<script>(function(){document.addEventListener("click",function(event){var button=event.target.closest(".toggle-pass");if(!button){return;}var input=document.getElementById(button.getAttribute("data-target"));if(!input){return;}var shown=input.type==="text";input.type=shown?"password":"text";button.textContent=shown?' . json_encode($tr('show_password'), JSON_UNESCAPED_UNICODE) . ':' . json_encode($tr('hide_password'), JSON_UNESCAPED_UNICODE) . ';});})();</script>'
-            . '</div></body></html>';
+            . '</section>'
+            . '</div>'
+            . $this->adminUiPageClose();
 
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
@@ -102,7 +131,7 @@ class AdminAuthController extends Controller {
     /**
      * @Route("/admin/forgot-password", name="admin_forgot_password", methods={"GET","POST"})
      */
-    public function forgotPasswordAction(Request $request, AdminPanelAccountStore $store): Response {
+    public function forgotPasswordAction(Request $request, AdminPanelAccountStore $store, SuplaMailer $mailer): Response {
         if ($request->query->has('lang')) {
             return $this->redirectWithLocale($request, '/admin/forgot-password');
         }
@@ -119,7 +148,11 @@ class AdminAuthController extends Controller {
                 $resetUrl = $request->getSchemeAndHttpHost() . '/admin/reset-password?token=' . rawurlencode($token);
                 $subject = $tr('reset_subject');
                 $body = sprintf($tr('reset_mail_body'), $resetUrl);
-                if (@mail($email, $subject, $body)) {
+                $message = (new Email())
+                    ->to($email)
+                    ->subject($subject)
+                    ->text($body);
+                if ($mailer->send($message)) {
                     $msg = $tr('reset_sent');
                 } else {
                     $err = $tr('reset_send_failed');
@@ -130,21 +163,22 @@ class AdminAuthController extends Controller {
             }
         }
 
-        $html = '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('forgot_password')) . '</title><style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7f8;min-height:100vh;display:flex;align-items:center;justify-content:center;}'
-            . '.card{width:min(440px,92vw);background:#fff;border:1px solid #e2e2e2;border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.06);}'
-            . 'label{display:block;font-size:12px;color:#444;margin:10px 0 6px 0;} input,button{font:inherit;padding:10px 12px;border:1px solid #ccc;border-radius:10px;width:100%;box-sizing:border-box;} button{margin-top:14px;background:#0b7a3a;border-color:#0b7a3a;color:#fff;cursor:pointer;} .notice{padding:10px 12px;border-radius:10px;margin-top:10px;font-size:13px;} .ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;} .bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;} a{color:#0b7a3a;text-decoration:none;}'
-            . '</style></head><body><div class="card"><div style="display:flex;justify-content:space-between;"><b>SUPLA Admin</b><div><a href="/admin/forgot-password?lang=pl">PL</a> | <a href="/admin/forgot-password?lang=en">EN</a></div></div><h1 style="font-size:18px;">' . $escape($tr('forgot_password')) . '</h1>'
-            . '<form method="post"><label>' . $escape($tr('username')) . '</label><input name="username" required /><label>' . $escape($tr('email')) . '</label><input name="email" type="email" required /><button type="submit">' . $escape($tr('send_reset')) . '</button></form>'
-            . '<div class="muted" style="margin-top:10px;font-size:12px;"><a href="/admin/login">' . $escape($tr('back_to_login')) . '</a></div>';
+        $html = $this->adminUiPageOpen(
+            $escape($tr('forgot_password')),
+            'body.auth-shell{display:flex;align-items:center;justify-content:center;padding:24px;}.auth-shell{background:radial-gradient(circle at top left,rgba(11,122,58,.08) 0,rgba(35,166,91,.05) 30%,transparent 60%),radial-gradient(circle at bottom right,rgba(11,122,58,.06) 0,transparent 48%),linear-gradient(180deg,#f5faf7 0,#eef3f6 100%);}.auth-shell .auth-card{width:min(900px,96vw);display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border-radius:24px;border:1px solid rgba(223,229,234,.95);background:rgba(255,255,255,.86);box-shadow:0 20px 60px rgba(16,24,40,.12);backdrop-filter:blur(14px);}.auth-shell .auth-hero{padding:30px;background:linear-gradient(160deg,var(--ui-accent) 0,var(--ui-accent-alt) 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:22px;}.auth-shell .auth-form{padding:30px;display:flex;flex-direction:column;justify-content:center;}.auth-shell .auth-form form{display:grid;gap:10px;margin-top:10px;}.auth-shell .auth-form label{font-size:12px;font-weight:700;color:#45515c;margin-bottom:-4px;}.auth-shell .auth-form input{width:100%;height:42px;}.auth-shell .submit{width:100%;height:44px;margin-top:4px;font-size:14px;font-weight:700;}.auth-shell .auth-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px;}@media (max-width:900px){.auth-shell .auth-card{grid-template-columns:1fr;}.auth-shell .auth-hero{padding:24px;}.auth-shell .auth-form{padding:24px;}}@media (max-width:640px){body.auth-shell{padding:10px;}.auth-shell .auth-card{border-radius:20px;}.auth-shell .auth-hero{padding:20px;}.auth-shell .auth-form{padding:20px;}}'
+            ,
+            'ui-shell auth-shell'
+        );
+        $html .= '<div class="auth-card"><section class="auth-hero"><div class="auth-hero-top"><a class="auth-hero-logo" href="/admin/login" aria-label="SUPLA Admin"><span class="auth-hero-mark">S</span><span>SUPLA Admin</span></a><div class="auth-lang"><a href="/admin/forgot-password?lang=pl">PL</a><a href="/admin/forgot-password?lang=en">EN</a></div></div><div class="auth-hero-copy"><h1>' . $escape($tr('forgot_password')) . '</h1><p>' . $escape($tr('forgot_password_help')) . '</p></div></section><section class="auth-form"><h2>' . $escape($tr('forgot_password')) . '</h2>'
+            . '<form method="post"><label>' . $escape($tr('username')) . '</label><input name="username" required /><label>' . $escape($tr('email')) . '</label><input name="email" type="email" required /><button type="submit" class="submit">' . $escape($tr('send_reset')) . '</button></form>'
+            . '<div class="auth-links"><div class="muted"><a href="/admin/login">' . $escape($tr('back_to_login')) . '</a></div></div>';
         if ($msg !== '') {
             $html .= '<div class="notice ok">' . $escape($msg) . '</div>';
         }
         if ($err !== '') {
             $html .= '<div class="notice bad">' . $escape($err) . '</div>';
         }
-        $html .= '</div></body></html>';
+        $html .= '</section></div>' . $this->adminUiPageClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -182,22 +216,24 @@ class AdminAuthController extends Controller {
             }
         }
 
-        $html = '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('reset_password')) . '</title><style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7f8;min-height:100vh;display:flex;align-items:center;justify-content:center;}'
-            . '.card{width:min(440px,92vw);background:#fff;border:1px solid #e2e2e2;border-radius:14px;padding:18px;box-shadow:0 6px 20px rgba(0,0,0,.06);} label{display:block;font-size:12px;color:#444;margin:10px 0 6px 0;} input,button{font:inherit;padding:10px 12px;border:1px solid #ccc;border-radius:10px;width:100%;box-sizing:border-box;} button{margin-top:14px;background:#0b7a3a;border-color:#0b7a3a;color:#fff;cursor:pointer;} .notice{padding:10px 12px;border-radius:10px;margin-top:10px;font-size:13px;} .ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;} .bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;} a{color:#0b7a3a;text-decoration:none;}'
-            . '</style></head><body><div class="card"><h1 style="font-size:18px;">' . $escape($tr('reset_password')) . '</h1>';
+        $html = $this->adminUiPageOpen(
+            $escape($tr('reset_password')),
+            'body.auth-shell{display:flex;align-items:center;justify-content:center;padding:24px;}.auth-shell{background:radial-gradient(circle at top left,rgba(11,122,58,.08) 0,rgba(35,166,91,.05) 30%,transparent 60%),radial-gradient(circle at bottom right,rgba(11,122,58,.06) 0,transparent 48%),linear-gradient(180deg,#f5faf7 0,#eef3f6 100%);}.auth-shell .auth-card{width:min(900px,96vw);display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border-radius:24px;border:1px solid rgba(223,229,234,.95);background:rgba(255,255,255,.86);box-shadow:0 20px 60px rgba(16,24,40,.12);backdrop-filter:blur(14px);}.auth-shell .auth-hero{padding:30px;background:linear-gradient(160deg,var(--ui-accent) 0,var(--ui-accent-alt) 100%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:22px;}.auth-shell .auth-form{padding:30px;display:flex;flex-direction:column;justify-content:center;}.auth-shell .auth-form form{display:grid;gap:10px;margin-top:10px;}.auth-shell .auth-form label{font-size:12px;font-weight:700;color:#45515c;margin-bottom:-4px;}.auth-shell .auth-form input{width:100%;height:42px;}.auth-shell .submit{width:100%;height:44px;margin-top:4px;font-size:14px;font-weight:700;}.auth-shell .auth-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-top:12px;}@media (max-width:900px){.auth-shell .auth-card{grid-template-columns:1fr;}.auth-shell .auth-hero{padding:24px;}.auth-shell .auth-form{padding:24px;}}@media (max-width:640px){body.auth-shell{padding:10px;}.auth-shell .auth-card{border-radius:20px;}.auth-shell .auth-hero{padding:20px;}.auth-shell .auth-form{padding:20px;}}'
+            ,
+            'ui-shell auth-shell'
+        );
+        $html .= '<div class="auth-card"><section class="auth-hero"><div class="auth-hero-top"><a class="auth-hero-logo" href="/admin/login" aria-label="SUPLA Admin"><span class="auth-hero-mark">S</span><span>SUPLA Admin</span></a><div class="auth-lang"><a href="/admin/reset-password?lang=pl">PL</a><a href="/admin/reset-password?lang=en">EN</a></div></div><div class="auth-hero-copy"><h1>' . $escape($tr('reset_password')) . '</h1><p>' . $escape($tr('reset_password_help')) . '</p></div></section><section class="auth-form"><h2>' . $escape($tr('reset_password')) . '</h2>';
         if ($msg !== '') {
             $html .= '<div class="notice ok">' . $escape($msg) . '</div><div class="muted" style="margin-top:10px;font-size:12px;"><a href="/admin/login">' . $escape($tr('back_to_login')) . '</a></div>';
         } elseif (!$account) {
             $html .= '<div class="notice bad">' . $escape($tr('reset_token_invalid')) . '</div>';
         } else {
-            $html .= '<form method="post"><input type="hidden" name="token" value="' . $escape($token) . '" /><label>' . $escape($tr('new_password')) . '</label><input type="password" name="newPassword" required /><label>' . $escape($tr('repeat_password')) . '</label><input type="password" name="newPassword2" required /><button type="submit">' . $escape($tr('save_new_password')) . '</button></form>';
+            $html .= '<form method="post"><input type="hidden" name="token" value="' . $escape($token) . '" /><label>' . $escape($tr('new_password')) . '</label><input type="password" name="newPassword" required /><label>' . $escape($tr('repeat_password')) . '</label><input type="password" name="newPassword2" required /><button type="submit" class="submit">' . $escape($tr('save_new_password')) . '</button></form>';
         }
         if ($err !== '') {
             $html .= '<div class="notice bad">' . $escape($err) . '</div>';
         }
-        $html .= '</div></body></html>';
+        $html .= '</section></div>' . $this->adminUiPageClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -272,6 +308,7 @@ class AdminAuthController extends Controller {
                 'account_locked' => 'Konto administratora jest tymczasowo zablokowane.',
                 'forgot_password' => 'Nie pamiętam hasła',
                 'separate_account' => 'To jest osobne konto administratora, niezależne od konta użytkownika SUPLA.',
+                'login_tip' => 'Użyj konta administratora i włącz 2FA, jeśli jest dostępne.',
                 'too_many_attempts' => 'Zbyt wiele błędnych prób. Spróbuj ponownie za %d s.',
                 'last_login' => 'Ostatnie udane logowanie: %s',
                 'email' => 'Adres e-mail',
@@ -284,6 +321,8 @@ class AdminAuthController extends Controller {
                 'reset_generic_error' => 'Nie udało się rozpocząć resetu hasła.',
                 'reset_password' => 'Reset hasła administratora',
                 'reset_token_invalid' => 'Link resetu jest nieprawidłowy lub wygasł.',
+                'forgot_password_help' => 'Podaj login i adres e-mail, aby wysłać bezpieczny link resetu.',
+                'reset_password_help' => 'Ustaw nowe hasło dla konta administratora.',
                 'new_password' => 'Nowe hasło',
                 'repeat_password' => 'Powtórz nowe hasło',
                 'save_new_password' => 'Zapisz nowe hasło',
@@ -303,6 +342,7 @@ class AdminAuthController extends Controller {
                 'account_locked' => 'The administrator account is temporarily locked.',
                 'forgot_password' => 'Forgot password',
                 'separate_account' => 'This is a separate administrator account, not a SUPLA user account.',
+                'login_tip' => 'Use your administrator account and keep 2FA enabled when available.',
                 'too_many_attempts' => 'Too many failed attempts. Try again in %d s.',
                 'last_login' => 'Last successful login: %s',
                 'email' => 'E-mail address',
@@ -315,6 +355,8 @@ class AdminAuthController extends Controller {
                 'reset_generic_error' => 'Could not start the password reset flow.',
                 'reset_password' => 'Administrator password reset',
                 'reset_token_invalid' => 'The reset link is invalid or expired.',
+                'forgot_password_help' => 'Provide your username and e-mail address to send a secure reset link.',
+                'reset_password_help' => 'Set a new password for the administrator account.',
                 'new_password' => 'New password',
                 'repeat_password' => 'Repeat new password',
                 'save_new_password' => 'Save new password',

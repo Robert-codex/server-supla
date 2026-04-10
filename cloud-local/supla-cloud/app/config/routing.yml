@@ -14,6 +14,18 @@ supla_admin_account:
   resource: "@SuplaBundle/Controller/AdminAccountController.php"
   type: annotation
 
+supla_admin_system_health:
+  resource: "@SuplaBundle/Controller/AdminSystemHealthController.php"
+  type: annotation
+
+supla_admin_backup:
+  resource: "@SuplaBundle/Controller/AdminBackupController.php"
+  type: annotation
+
+supla_admin_backup_scheduler:
+  resource: "@SuplaBundle/Controller/AdminBackupSchedulerController.php"
+  type: annotation
+
 supla_default:
   resource: "@SuplaBundle/Controller/DefaultController.php"
   type: annotation

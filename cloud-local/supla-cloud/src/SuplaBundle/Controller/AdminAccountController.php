@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class AdminAccountController extends Controller {
+    use AdminUiTrait;
+
     private const ISSUER = 'SUPLA Admin';
     private const LOCALE_COOKIE = 'supla_admin_locale';
 
@@ -37,30 +39,11 @@ class AdminAccountController extends Controller {
 
         $escape = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $twoFactorStatus = $twoFactorEnabled ? 'ON' : 'OFF';
-        $html = '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('account_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 14px 0;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . '.card{background:#fff;border:1px solid #e2e2e2;border-radius:12px;padding:14px;margin:12px 0;}'
-            . 'label{display:block;font-size:12px;color:#444;margin:10px 0 6px 0;}'
-            . 'input,button{font:inherit;padding:10px 12px;border:1px solid #ccc;border-radius:10px;width:100%;box-sizing:border-box;}'
-            . 'button{margin-top:12px;background:#0b7a3a;border-color:#0b7a3a;color:#fff;cursor:pointer;}'
-            . 'button.gray{background:#333;border-color:#333;}'
-            . 'button.danger{background:#b00020;border-color:#b00020;}'
-            . '.row{display:grid;grid-template-columns:1fr;gap:10px;}'
-            . '.notice{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:13px;}'
-            . '.notice.ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;}'
-            . '.notice.bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;}'
-            . 'pre{background:#fafafa;border:1px solid #eee;border-radius:10px;padding:10px;overflow:auto;font-size:12px;}'
-            . 'table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:12px;}th{background:#fafafa;}'
-            . '</style><script src="/dist/qrcode-local.js?v=edgefix-v30"></script></head><body>';
-
-        $html .= '<div class="top">'
-            . '<div><a href="/admin/users">← ' . $escape($tr('users')) . '</a>' . $this->adminLinks($locale) . ' | <a href="/admin/account?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a> | <a href="/admin/account?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a></div>'
-            . '<div><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a> | <a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
+        $html = $this->adminUiLayoutOpen($escape($tr('account_title')), 'account', false, 'body{overflow-x:hidden;}');
+        $html .= '<script src="/dist/qrcode-local.js?v=edgefix-v30"></script>';
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted"><a href="/admin/users">← ' . $escape($tr('users')) . '</a>' . $this->adminLinks($locale) . '</div>'
+            . '<div class="ui-page-actions"><a href="/admin/account?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a><a href="/admin/account?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
             . '</div>';
         $html .= '<h1>' . $escape($tr('account_title')) . '</h1>';
 
@@ -122,7 +105,7 @@ class AdminAccountController extends Controller {
         }
         $html .= '</div>';
 
-        $html .= '</body></html>';
+        $html .= $this->adminUiLayoutClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -139,18 +122,11 @@ class AdminAccountController extends Controller {
         $escape = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $audit = $store->getAuditTail(200);
 
-        $html = '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('security_log_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 14px 0;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . '.card{background:#fff;border:1px solid #e2e2e2;border-radius:12px;padding:14px;margin:12px 0;}'
-            . 'table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:12px;}th{background:#fafafa;}'
-            . '</style></head><body>';
-
-        $html .= '<div class="top"><div><a href="/admin/users">← ' . $escape($tr('users')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a>' . $this->adminLinks($locale) . ' | <a href="/admin/security-log?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a> | <a href="/admin/security-log?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a></div><div><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div></div>';
+        $html = $this->adminUiLayoutOpen($escape($tr('security_log_title')), 'security-log', false);
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted"><a href="/admin/users">← ' . $escape($tr('users')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a>' . $this->adminLinks($locale) . '</div>'
+            . '<div class="ui-page-actions"><a href="/admin/security-log?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a><a href="/admin/security-log?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
+            . '</div>';
         $html .= '<h1>' . $escape($tr('security_log_title')) . '</h1>';
         $html .= '<div class="card"><table><thead><tr><th>' . $escape($tr('entry')) . '</th></tr></thead><tbody>';
         if (!$audit) {
@@ -161,7 +137,7 @@ class AdminAccountController extends Controller {
             }
         }
         $html .= '</tbody></table></div>';
-        $html .= '</body></html>';
+        $html .= $this->adminUiLayoutClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -255,21 +231,11 @@ class AdminAccountController extends Controller {
             $rows = '<tr><td colspan="5" style="color:#666;">' . $escape($tr('no_admin_history')) . '</td></tr>';
         }
 
-        $html = '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('admin_history_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0 14px 0;}'
-            . '.card{background:#fff;border:1px solid #e2e2e2;border-radius:12px;padding:14px;margin:12px 0;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . 'table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:12px;}th{background:#fafafa;}'
-            . '.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;}'
-            . '.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:end;}'
-            . 'input,select,button{font:inherit;padding:10px 12px;border:1px solid #ccc;border-radius:10px;box-sizing:border-box;background:#fff;}'
-            . 'button{background:#0b7a3a;border-color:#0b7a3a;color:#fff;cursor:pointer;}'
-            . '</style></head><body>';
-        $html .= '<div class="top"><div><a href="/admin/dashboard">' . $escape($tr('dashboard')) . '</a> | <a href="/admin/users">' . $escape($tr('users')) . '</a> | <a href="/admin/admins">' . $escape($tr('admins_menu')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a></div><div><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a> | <a href="/admin/logout">' . $escape($tr('logout')) . '</a></div></div>';
+        $html = $this->adminUiLayoutOpen($escape($tr('admin_history_title')), 'admin-history', true);
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted"><a href="/admin/users">' . $escape($tr('users')) . '</a> | <a href="/admin/admins">' . $escape($tr('admins_menu')) . '</a> | <a href="/admin/backup">' . $escape($tr('backup_restore')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a></div>'
+            . '<div class="ui-page-actions"><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
+            . '</div>';
         $html .= '<h1>' . $escape($tr('admin_history_title')) . '</h1>';
         $html .= '<div class="card"><form method="get" action="/admin/admin-history" class="filters">'
             . '<div><label>' . $escape($tr('event')) . '</label><select name="event">' . $eventOptions . '</select></div>'
@@ -294,7 +260,7 @@ class AdminAccountController extends Controller {
             'dateTo' => $dateToFilter,
         ], $tr, $escape);
         $html .= '</div>';
-        $html .= '</body></html>';
+        $html .= $this->adminUiLayoutClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -581,7 +547,7 @@ class AdminAccountController extends Controller {
             . 'button[disabled]{opacity:.5;cursor:not-allowed;}'
             . '.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;}'
             . '</style></head><body>';
-        $html .= '<div class="top"><div><a href="/admin/dashboard">' . $escape($tr('dashboard')) . '</a> | <a href="/admin/users">' . $escape($tr('users')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a> | <a href="/admin/admin-history">' . $escape($tr('admin_history_menu')) . '</a> | <a href="/admin/admins?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a> | <a href="/admin/admins?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a></div><div><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a> | <a href="/admin/logout">' . $escape($tr('logout')) . '</a></div></div>';
+        $html .= '<div class="top"><div><a href="/admin/users">' . $escape($tr('users')) . '</a> | <a href="/admin/account">' . $escape($tr('account')) . '</a> | <a href="/admin/admin-history">' . $escape($tr('admin_history_menu')) . '</a> | <a href="/admin/backup">' . $escape($tr('backup_restore')) . '</a> | <a href="/admin/admins?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a> | <a href="/admin/admins?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a></div><div><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a> | <a href="/admin/logout">' . $escape($tr('logout')) . '</a></div></div>';
         $html .= '<h1>' . $escape($tr('admins_title')) . '</h1>' . $notice;
         $html .= '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('new_admin')) . '</h3>'
             . '<form method="post" action="/admin/admins/create">'
@@ -759,7 +725,9 @@ class AdminAccountController extends Controller {
 
     private function adminLinks(string $locale = 'pl'): string {
         $tr = $this->translator($locale);
-        return $this->isGranted('ROLE_ADMIN_SUPER') ? ' | <a href="/admin/admins">' . htmlspecialchars($tr('admins_menu'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a> | <a href="/admin/admin-history">' . htmlspecialchars($tr('admin_history_menu'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>' : '';
+        return $this->isGranted('ROLE_ADMIN_SUPER')
+            ? ' | <a href="/admin/admins">' . htmlspecialchars($tr('admins_menu'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a> | <a href="/admin/admin-history">' . htmlspecialchars($tr('admin_history_menu'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a> | <a href="/admin/health">' . htmlspecialchars($tr('system_health'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a> | <a href="/admin/backup">' . htmlspecialchars($tr('backup_restore'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>'
+            : ' | <a href="/admin/health">' . htmlspecialchars($tr('system_health'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a>';
     }
 
     private function handleLocaleSwitch(Request $request, string $path): ?RedirectResponse {
@@ -852,6 +820,8 @@ class AdminAccountController extends Controller {
                 'admins_title' => 'SUPLA Admin - Admini',
                 'admins_menu' => 'Admini',
                 'admin_history_menu' => 'Historia adminów',
+                'system_health' => 'Stan systemu',
+                'backup_restore' => 'Backup / Restore',
                 'admin_history_title' => 'SUPLA Admin - Historia adminów',
                 'dashboard' => 'Dashboard',
                 'users' => 'Użytkownicy',
@@ -963,6 +933,8 @@ class AdminAccountController extends Controller {
                 'admins_title' => 'SUPLA Admin - Admins',
                 'admins_menu' => 'Admins',
                 'admin_history_menu' => 'Admin history',
+                'system_health' => 'System health',
+                'backup_restore' => 'Backup / Restore',
                 'admin_history_title' => 'SUPLA Admin - Admin history',
                 'dashboard' => 'Dashboard',
                 'users' => 'Users',

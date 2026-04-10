@@ -2,12 +2,27 @@ services:
   supla-cloud:
     environment:
       ACCOUNT_LIMITS_SELF_UPDATE_ENABLED: ${ACCOUNT_LIMITS_SELF_UPDATE_ENABLED:-false}
+      ADMIN_PANEL_USER: ${ADMIN_PANEL_USER:-}
+      ADMIN_PANEL_PASSWORD_HASH: ${ADMIN_PANEL_PASSWORD_HASH:-}
+      ADMIN_PANEL_STORAGE_FILE: ${ADMIN_PANEL_STORAGE_FILE:-/var/www/cloud/var/admin_panel.json}
+      ADMIN_PANEL_AUDIT_LOG_FILE: ${ADMIN_PANEL_AUDIT_LOG_FILE:-/var/www/cloud/var/admin_panel_audit.log}
+      ADMIN_PANEL_ATTEMPTS_FILE: ${ADMIN_PANEL_ATTEMPTS_FILE:-/var/www/cloud/var/admin_panel_attempts.json}
+      ADMIN_BACKUP_SCHEDULE_FILE: ${ADMIN_BACKUP_SCHEDULE_FILE:-/var/www/cloud/var/admin_backup_schedule.json}
     volumes:
       - ../cloud-local/supla-cloud/app/config/security.yml:/var/www/cloud/app/config/security.yml:ro
+      - ../cloud-local/supla-cloud/app/config/routing.yml:/var/www/cloud/app/config/routing.yml:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/ServerController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/ServerController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/UserController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/UserController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/TokenController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/TokenController.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/Api/TwoFactorController.php:/var/www/cloud/src/SuplaBundle/Controller/Api/TwoFactorController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminUsersController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminUsersController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminAccountController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminAccountController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminSystemHealthController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminSystemHealthController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminBackupController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminBackupController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminBackupSchedulerController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminBackupSchedulerController.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Controller/AdminUiTrait.php:/var/www/cloud/src/SuplaBundle/Controller/AdminUiTrait.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Security/AdminBackupScheduleStore.php:/var/www/cloud/src/SuplaBundle/Security/AdminBackupScheduleStore.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Security/RegistrationBlockStore.php:/var/www/cloud/src/SuplaBundle/Security/RegistrationBlockStore.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/DependencyInjection/Configuration.php:/var/www/cloud/src/SuplaBundle/DependencyInjection/Configuration.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/DependencyInjection/SuplaExtension.php:/var/www/cloud/src/SuplaBundle/DependencyInjection/SuplaExtension.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Model/LoginChallengeTokenService.php:/var/www/cloud/src/SuplaBundle/Model/LoginChallengeTokenService.php:ro
@@ -17,7 +32,15 @@ services:
       - ../cloud-local/supla-cloud/src/SuplaBundle/Twig/FrontendConfig.php:/var/www/cloud/src/SuplaBundle/Twig/FrontendConfig.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/SynchronizeEspUpdatesCommand.php:ro
       - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/MoveNewMeasurementLogsCommand.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Model/AdminScheduledBackupManager.php:/var/www/cloud/src/SuplaBundle/Model/AdminScheduledBackupManager.php:ro
+      - ../cloud-local/supla-cloud/src/SuplaBundle/Command/Admin/RunScheduledBackupsCommand.php:/var/www/cloud/src/SuplaBundle/Command/Admin/RunScheduledBackupsCommand.php:ro
       - ../cloud-local/supla-cloud/app/config/services/services.yml:/var/www/cloud/app/config/services/services.yml:ro
       - ../cloud-local/supla-cloud/web/index.html:/var/www/cloud/web/index.html:ro
       - ../cloud-local/supla-cloud/web/dist:/var/www/cloud/web/dist:ro
       - ../cloud-local/supla-cloud/docker-php-entrypoint.sh:/usr/local/bin/docker-php-entrypoint:ro
+      - ../cloud-local/supla-cloud/docker/cron/admin-backup-scheduler:/etc/cron.d/supla-admin-backup-scheduler:ro
+      - ../cloud-local/supla-cloud/var/admin_panel.json:/var/www/cloud/var/admin_panel.json
+      - ../cloud-local/supla-cloud/var/admin_panel_audit.log:/var/www/cloud/var/admin_panel_audit.log
+      - ../cloud-local/supla-cloud/var/admin_panel_attempts.json:/var/www/cloud/var/admin_panel_attempts.json
+      - ../cloud-local/supla-cloud/var/admin_backup_schedule.json:/var/www/cloud/var/admin_backup_schedule.json
+      - ../cloud-local/supla-cloud/var/backups:/var/www/cloud/var/backups

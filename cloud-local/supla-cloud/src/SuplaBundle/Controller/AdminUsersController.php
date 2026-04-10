@@ -27,6 +27,7 @@ use SuplaBundle\Model\LocationManager;
 use SuplaBundle\Model\UserManager;
 use SuplaBundle\Security\AdminPanelAccountStore;
 use SuplaBundle\Security\AdminPanelUser;
+use SuplaBundle\Security\RegistrationBlockStore;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -41,8 +42,11 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
  * Access is additionally restricted by env var ADMIN_PANEL_ALLOWED_EMAILS (comma-separated).
  */
 class AdminUsersController extends Controller {
+    use AdminUiTrait;
+
     private const PER_PAGE = 50;
     private const LOCALE_COOKIE = 'supla_admin_locale';
+    private const PASSWORD_RESET_COOLDOWN_SECONDS = 600;
     private const PREF_BLOCKED_UNTIL = 'admin.blockedUntil';
     private const PREF_BLOCK_PROFILE = 'admin.blockProfile';
     private const PREF_BLOCK_HISTORY = 'admin.blockHistory';
@@ -77,7 +81,7 @@ class AdminUsersController extends Controller {
      * @Route("/admin", methods={"GET"})
      * @Route("/admin/dashboard", methods={"GET"})
      */
-    public function dashboardAction(Request $request, EntityManagerInterface $em, AdminPanelAccountStore $store): Response {
+    public function dashboardAction(Request $request, EntityManagerInterface $em, AdminPanelAccountStore $store, RegistrationBlockStore $registrationBlockStore): Response {
         if ($guard = $this->requireAllowedAdminUser()) {
             return $guard;
         }
@@ -167,15 +171,17 @@ class AdminUsersController extends Controller {
         $securityEvents = $store->getAuditTail(10);
         $registrationSeries = $this->buildRecentRegistrationSeries($em, 30);
         $authFailureSeries = $this->buildRecentAdminAuthFailureSeries($store, 30);
+        $registrationState = $registrationBlockStore->getState();
+        $alerts = $this->buildDashboardAlerts($stats, $blockedUsers, $pendingLimitUsers, $problemUsers, $locale);
 
-        $html = $this->renderDashboardHtml($stats, $recentUsers, $pendingUsers, $blockedUsers, $pendingLimitUsers, $problemUsers, $securityEvents, $registrationSeries, $authFailureSeries, $msg, $err, $locale, $searchQuery);
+        $html = $this->renderDashboardHtml($stats, $recentUsers, $pendingUsers, $blockedUsers, $pendingLimitUsers, $problemUsers, $securityEvents, $registrationSeries, $authFailureSeries, $registrationState, $alerts, $msg, $err, $locale, $searchQuery);
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
     /**
      * @Route("/admin/users", methods={"GET"})
      */
-    public function listAction(Request $request, EntityManagerInterface $em): Response {
+    public function listAction(Request $request, EntityManagerInterface $em, RegistrationBlockStore $registrationBlockStore): Response {
         if ($guard = $this->requireAllowedAdminUser()) {
             return $guard;
         }
@@ -228,7 +234,8 @@ class AdminUsersController extends Controller {
         }
 
         $locale = $this->getAdminLocale($request);
-        $html = $this->renderUsersHtml($request, $users, $page, $hasNext, $query, $enabledFilter, $msg, $err, $locale);
+        $registrationState = $registrationBlockStore->getState();
+        $html = $this->renderUsersHtml($request, $users, $page, $hasNext, $query, $enabledFilter, $msg, $err, $locale, $registrationState);
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
     }
 
@@ -250,6 +257,69 @@ class AdminUsersController extends Controller {
         $err = (string)$request->query->get('err', '');
         $html = $this->renderUserDetailsHtml($user, $msg, $err, $this->getAdminLocale($request));
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+    }
+
+    /**
+     * @Route("/admin/users/{id}/reset-password", requirements={"id"="\d+"}, methods={"POST"})
+     */
+    public function resetPasswordAction(Request $request, int $id, EntityManagerInterface $em, UserManager $userManager, AdminPanelAccountStore $store): Response {
+        if ($guard = $this->requireAllowedAdminUser()) {
+            return $guard;
+        }
+        if ($guard = $this->requireAdminOperator()) {
+            return $guard;
+        }
+        if ($response = $this->rejectInvalidCsrf($request, 'admin_user_reset_password_' . $id)) {
+            return $response;
+        }
+
+        $locale = $this->getAdminLocale($request);
+        $tr = $this->translator($locale);
+
+        /** @var User|null $user */
+        $user = $em->getRepository(User::class)->find($id);
+        if (!$user) {
+            return $this->redirectWith($request, 'err', $tr('user_not_found'));
+        }
+
+        $email = trim((string)$user->getEmail());
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->redirectWith($request, 'err', $tr('invalid_email_address'));
+        }
+        $force = $this->isGranted('ROLE_ADMIN_SUPER') && $request->request->getBoolean('force');
+        if ($remaining = $this->getPasswordResetCooldownRemaining($store, $id)) {
+            if ($force) {
+                $store->audit('admin_user_password_reset_cooldown_overridden', [
+                    'admin' => (string)($this->getUser() instanceof AdminPanelUser ? $this->getUser()->getUsername() : ''),
+                    'userId' => $id,
+                    'email' => $email,
+                    'ip' => $request->getClientIp(),
+                ]);
+            } else {
+                return $this->redirectWith($request, 'err', sprintf($tr('password_reset_link_rate_limited'), (int)ceil($remaining / 60)));
+            }
+        }
+        if ($force && !$this->isGranted('ROLE_ADMIN_SUPER')) {
+            return $this->redirectWith($request, 'err', $tr('password_reset_link_failed'));
+        }
+        if ($force && $remaining <= 0) {
+            // no-op, same flow as normal send
+        }
+
+        try {
+            $userManager->passwordResetRequest($user);
+            $store->audit('admin_user_password_reset_requested', [
+                'admin' => (string)($this->getUser() instanceof AdminPanelUser ? $this->getUser()->getUsername() : ''),
+                'userId' => $id,
+                'email' => $email,
+                'ip' => $request->getClientIp(),
+                'force' => $force,
+            ]);
+        } catch (\Throwable $e) {
+            return $this->redirectWith($request, 'err', $tr('password_reset_link_failed'));
+        }
+
+        return $this->redirectWith($request, 'msg', $tr('password_reset_link_sent'));
     }
 
     /**
@@ -667,6 +737,27 @@ class AdminUsersController extends Controller {
         return $this->redirectWith($request, 'msg', 'User deleted.');
     }
 
+    /**
+     * @Route("/admin/users/registration-block", methods={"POST"})
+     */
+    public function registrationBlockToggleAction(Request $request, RegistrationBlockStore $registrationBlockStore): Response {
+        if ($guard = $this->requireAllowedAdminUser()) {
+            return $guard;
+        }
+        if ($guard = $this->requireAdminSuper()) {
+            return $guard;
+        }
+        if ($response = $this->rejectInvalidCsrf($request, 'admin_registration_block_toggle')) {
+            return $response;
+        }
+
+        $locale = $this->getAdminLocale($request);
+        $tr = $this->translator($locale);
+        $blocked = (string)$request->request->get('blocked', '1') === '1';
+        $registrationBlockStore->setBlocked($blocked, $this->currentAdminUsername() ?: 'admin');
+        return new RedirectResponse('/admin/users?msg=' . rawurlencode($blocked ? $tr('registration_blocked_saved') : $tr('registration_allowed_saved')) . '#registration-block');
+    }
+
     private function redirectWith(Request $request, string $key, string $value): RedirectResponse {
         if ((string)$request->query->get('return', '') === 'details') {
             $params = $request->query->all();
@@ -707,6 +798,32 @@ class AdminUsersController extends Controller {
         return null;
     }
 
+    private function currentAdminUsername(): string {
+        $user = $this->getUser();
+        return $user instanceof AdminPanelUser ? (string)$user->getUsername() : '';
+    }
+
+    private function getPasswordResetCooldownRemaining(AdminPanelAccountStore $store, int $userId): int {
+        $entries = $store->getAuditEntries(500);
+        for ($i = count($entries) - 1; $i >= 0; $i--) {
+            $entry = $entries[$i];
+            if (($entry['event'] ?? '') !== 'admin_user_password_reset_requested') {
+                continue;
+            }
+            $meta = is_array($entry['meta'] ?? null) ? $entry['meta'] : [];
+            if ((int)($meta['userId'] ?? 0) !== $userId) {
+                continue;
+            }
+            $timestamp = strtotime((string)($entry['ts'] ?? '')) ?: 0;
+            if ($timestamp <= 0) {
+                continue;
+            }
+            $remaining = ($timestamp + self::PASSWORD_RESET_COOLDOWN_SECONDS) - time();
+            return max(0, $remaining);
+        }
+        return 0;
+    }
+
     /**
      * @param User[] $users
      */
@@ -719,7 +836,8 @@ class AdminUsersController extends Controller {
         string $enabledFilter,
         string $msg,
         string $err,
-        string $locale
+        string $locale,
+        array $registrationState
     ): string {
         $escape = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $tr = $this->translator($locale);
@@ -739,6 +857,7 @@ class AdminUsersController extends Controller {
 
         $rows = '';
         $canWrite = $this->isGranted('ROLE_ADMIN_OPERATOR') || $this->isGranted('ROLE_ADMIN_SUPER');
+        $canSuper = $this->isGranted('ROLE_ADMIN_SUPER');
         $canDelete = $this->isGranted('ROLE_ADMIN_SUPER');
         foreach ($users as $index => $user) {
             $id = (int)$user->getId();
@@ -759,19 +878,39 @@ class AdminUsersController extends Controller {
             $pending = $user->getPreference(self::PREF_PENDING_LIMITS, null);
             $hasPending = is_array($pending);
             $limitsLock = (bool)$user->getPreference(self::PREF_LIMITS_SELF_UPDATE_LOCKED, false);
+            $resetConfirmPrompt = json_encode(sprintf($tr('confirm_password_reset_prompt'), $displayCode, $email), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $resetForceConfirmPrompt = json_encode(sprintf($tr('confirm_password_reset_force_prompt'), $displayCode, $email), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
             $actionQs = $baseQs ? ('?' . $baseQs . '&page=' . $page) : ('?page=' . $page);
 
             $rows .= '<tr>';
             $rows .= '<td class="mono">' . $rowNumber . '</td>';
             $rows .= '<td class="mono">' . $displayCodeHtml . '</td>';
-            $rows .= '<td><a href="/admin/users/' . $id . '">' . $escape($email) . '</a></td>';
+            $rows .= '<td><a href="/admin/users/' . $id . '">' . $escape($email) . '</a>';
+            if ($canWrite) {
+                $rows .= ' <form method="post" action="/admin/users/' . $id . '/reset-password' . $actionQs . '" style="display:inline;" onsubmit="return confirm(' . $resetConfirmPrompt . ');">';
+                $rows .= $this->csrfField('admin_user_reset_password_' . $id);
+                $rows .= '<button type="submit" class="mini-reset">' . $escape($tr('send_password_reset_link_short')) . '</button>';
+                $rows .= '</form>';
+                if ($canSuper) {
+                    $rows .= ' <form method="post" action="/admin/users/' . $id . '/reset-password' . $actionQs . '" style="display:inline;" onsubmit="return confirm(' . $resetForceConfirmPrompt . ');">';
+                    $rows .= $this->csrfField('admin_user_reset_password_' . $id);
+                    $rows .= '<input type="hidden" name="force" value="1" />';
+                    $rows .= '<button type="submit" class="mini-reset force">' . $escape($tr('send_password_reset_link_force_short')) . '</button>';
+                    $rows .= '</form>';
+                }
+            }
+            $rows .= '</td>';
             $rows .= '<td class="' . $enabledClass . '">' . $enabled . '</td>';
             $rows .= '<td class="' . ($blockedNow ? 'bad' : 'ok') . '">' . $escape($blockedText) . '</td>';
             $rows .= '<td class="mono">' . $escape($regDate) . '</td>';
             $rows .= '<td class="mono">' . $escape($locale) . '</td>';
             $rows .= '<td class="actions">';
             if ($canWrite) {
+                $rows .= '<form method="post" action="/admin/users/' . $id . '/reset-password' . $actionQs . '" onsubmit="return confirm(' . $resetConfirmPrompt . ');">';
+                $rows .= $this->csrfField('admin_user_reset_password_' . $id);
+                $rows .= '<button type="submit">' . $escape($tr('send_password_reset_link')) . '</button>';
+                $rows .= '</form>';
                 if ($user->isEnabled()) {
                     $rows .= '<form method="post" action="/admin/users/' . $id . '/toggle-enabled' . $actionQs . '">';
                     $rows .= $this->csrfField('admin_user_toggle_enabled_' . $id);
@@ -846,62 +985,30 @@ class AdminUsersController extends Controller {
         if ($err !== '') {
             $notice .= '<div class="notice bad">' . $escape($err) . '</div>';
         }
+        $registrationBlockTileHtml = $this->renderRegistrationBlockTile($registrationState, $tr, $escape);
+        $registrationBlockHtml = $this->renderRegistrationBlockCard($registrationState, $tr, $escape);
 
-        return '<!doctype html>'
-            . '<html><head><meta charset="utf-8" />'
-            . '<meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('title_users')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px 0;}'
-            . 'input,select,button{font:inherit;padding:8px 10px;border:1px solid #ccc;border-radius:8px;background:#fff;}'
-            . 'button{cursor:pointer;}'
-            . 'table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e2e2e2;border-radius:12px;overflow:hidden;}'
-            . 'th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;}'
-            . 'th{background:#fafafa;font-weight:600;font-size:13px;color:#222;}'
-            . 'tr:last-child td{border-bottom:none;}'
-            . '.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;}'
-            . '.ok{color:#0b7a3a;}'
-            . '.bad{color:#b00020;}'
-            . '.actions{display:flex;gap:8px;flex-wrap:wrap;}'
-            . '.danger input{min-width:220px;}'
-            . 'button.danger{background:#b00020;color:#fff;border-color:#b00020;}'
-            . '.notice{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:13px;}'
-            . '.notice.ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;}'
-            . '.notice.bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;}'
-            . '.pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}'
-            . 'a:hover{text-decoration:underline;}'
-            . '.copy-btn{margin-left:6px;width:26px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;vertical-align:middle;}'
-            . '.copy-btn.copied{background:#e7f6ee;border-color:#bfe8cf;color:#0b7a3a;}'
-            . '</style></head><body>'
+        $html = $this->adminUiLayoutOpen(
+            $escape($tr('title_users')),
+            'users',
+            $this->isGranted('ROLE_ADMIN_SUPER'),
+            '.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px 0;}.pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px;}.copy-btn{margin-left:6px;width:26px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;vertical-align:middle;}.copy-btn.copied{background:#e7f6ee;border-color:#bfe8cf;color:#0b7a3a;}.mini-reset{margin-left:6px;padding:3px 8px;font-size:11px;border-radius:999px;line-height:1.2;background:#eef7f1;border-color:#bfe8cf;color:#0b7a3a;}.mini-reset.force{background:#fff4db;border-color:#f0d18a;color:#8a5a00;}.actions{display:flex;gap:8px;flex-wrap:wrap;}.danger input{min-width:220px;}.ui-page-tools{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px 0;flex-wrap:wrap;}.ui-page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}.ui-page-actions a{padding:6px 10px;border-radius:999px;background:#f6f8f9;border:1px solid #dfe5ea;text-decoration:none !important;}.registration-tile{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border-left:4px solid #0b7a3a;background:linear-gradient(180deg,#f5fbf7 0%,#fff 100%);}.registration-tile.blocked{border-left-color:#b00020;background:linear-gradient(180deg,#fff7f7 0%,#fff 100%);box-shadow:0 8px 26px rgba(176,0,32,.08);}.registration-tile .badge{font-size:11px;font-weight:800;}.registration-tile .tile-main{min-width:220px;flex:1 1 320px;}.registration-tile .tile-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0b7a3a;margin:0 0 6px 0;}.registration-tile.blocked .tile-title{color:#b00020;}.registration-tile .tile-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}.registration-tile .tile-head strong{font-size:15px;}.registration-tile .tile-summary{font-size:13px;font-weight:600;}.registration-tile .tile-hint{margin-top:4px;color:#666;font-size:12px;max-width:52rem;}.registration-tile .tile-action{display:inline-block;text-decoration:none;padding:8px 12px;border-radius:10px;background:#0b7a3a;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(11,122,58,.2);}.registration-tile.blocked .tile-action{background:#b00020;box-shadow:0 4px 14px rgba(176,0,32,.2);}'
+        );
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted">' . $escape($tr('title_users')) . '</div>'
+            . '<div class="ui-page-actions"><a href="/admin/users?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a><a href="/admin/users?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a><a href="/admin/account">' . $escape($tr('account')) . '</a><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
+            . '</div>'
             . '<h1>' . $escape($tr('title_users')) . '</h1>'
-            . '<div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin:6px 0 8px 0;">'
-            . '<div>'
-            . '<a href="/admin/dashboard">' . $escape($tr('dashboard')) . '</a>'
-            . ' | '
-            . ($this->isGranted('ROLE_ADMIN_SUPER') ? '<a href="/admin/admins">' . $escape($tr('admins_menu')) . '</a> | <a href="/admin/admin-history">' . $escape($tr('admin_history_menu')) . '</a> | ' : '')
-            . ''
-            . '<a href="/admin/users?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a>'
-            . ' | '
-            . '<a href="/admin/users?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a>'
-            . '</div>'
-            . '<div>'
-            . '<a href="/admin/account">' . $escape($tr('account')) . '</a>'
-            . ' | '
-            . '<a href="/admin/security-log">' . $escape($tr('security_log')) . '</a>'
-            . ' | '
-            . '<a href="/admin/logout">' . $escape($tr('logout')) . '</a>'
-            . '</div>'
-            . '</div>'
             . $notice
+            . $registrationBlockTileHtml
+            . '<div class="notice ok" style="margin-top:-2px;">' . $escape($tr('registration_block_success_notice')) . '</div>'
             . '<form class="bar" method="get" action="/admin/users">'
             . '<input name="q" placeholder="' . $escape($tr('search_email')) . '" value="' . $escape($query) . '" />'
             . '<select name="enabled">' . $optionsHtml . '</select>'
             . '<button type="submit">' . $escape($tr('search')) . '</button>'
             . ($baseQs !== '' ? '<a href="/admin/users">' . $escape($tr('clear')) . '</a>' : '')
             . '</form>'
+            . $registrationBlockHtml
             . '<table><thead><tr>'
             . '<th>' . $escape($tr('lp')) . '</th><th>' . $escape($tr('user_code')) . '</th><th>Email</th><th>' . $escape($tr('enabled')) . '</th><th>' . $escape($tr('blocked')) . '</th><th>' . $escape($tr('registered')) . '</th><th>' . $escape($tr('locale')) . '</th><th>' . $escape($tr('actions')) . '</th>'
             . '</tr></thead><tbody>'
@@ -913,11 +1020,10 @@ class AdminUsersController extends Controller {
             . ($page > 1 ? '<a href="' . $escape($prevUrl) . '">' . $escape($tr('prev')) . '</a>' : '<span style="opacity:.5;">' . $escape($tr('prev')) . '</span>')
             . ($hasNext ? '<a href="' . $escape($nextUrl) . '">' . $escape($tr('next')) . '</a>' : '<span style="opacity:.5;">' . $escape($tr('next')) . '</span>')
             . '</div></div>'
-            . '<p style="margin-top:14px;color:#666;font-size:12px;">'
-            . $escape($tr('delete_warning'))
-            . '</p>'
+            . '<p style="margin-top:14px;color:#666;font-size:12px;">' . $escape($tr('delete_warning')) . '</p>'
             . $this->renderCopyCodeScript($tr('copied'))
-            . '</body></html>';
+            . $this->adminUiLayoutClose();
+        return $html;
     }
 
     private function getAdminLocale(Request $request): string {
@@ -936,6 +1042,8 @@ class AdminUsersController extends Controller {
                 'dashboard_title' => 'SUPLA Admin - Dashboard',
                 'admins_menu' => 'Admins',
                 'admin_history_menu' => 'Admin history',
+                'system_health' => 'System health',
+                'backup_restore' => 'Backup / Restore',
                 'title_users' => 'SUPLA Admin - Users',
                 'account' => 'Account',
                 'lp' => 'No.',
@@ -964,7 +1072,31 @@ class AdminUsersController extends Controller {
                 'pending_accounts' => 'Accounts pending confirmation',
                 'blocked_users' => 'Blocked users',
                 'pending_limit_approvals' => 'Pending limit approvals',
+                'registration_block' => 'Registration block',
+                'registration_blocked_summary' => 'New user registrations are currently blocked.',
+                'registration_allowed_summary' => 'New user registrations are currently allowed.',
+                'registration_blocked_state' => 'Registration is blocked',
+                'registration_allowed_state' => 'Registration is allowed',
+                'registration_block_banner_title' => 'Registration control',
+                'registration_block_banner_subtitle' => 'Accounts & limits',
+                'registration_block_banner_hint' => 'The switch is below. Jump there to change the status.',
+                'registration_block_banner_action' => 'Go to switch',
+                'registration_block_hint' => 'Use this switch to control whether new users can register.',
+                'registration_allow' => 'Allow registration',
+                'registration_changed_at' => 'Changed at',
+                'registration_changed_by' => 'Changed by',
+                'registration_message' => 'Message',
+                'registration_blocked_saved' => 'Registration blocked.',
+                'registration_allowed_saved' => 'Registration allowed.',
+                'registration_block_success_notice' => 'Registration status updated.',
+                'registration_block_superadmin_only' => 'Only a superadmin can change registration status.',
                 'recent_admin_security_events' => 'Recent admin security events',
+                'alerts_title' => 'Admin alerts',
+                'no_alerts' => 'No active alerts.',
+                'open' => 'Open',
+                'blocked_users_alert' => '%d blocked users require attention.',
+                'pending_limits_alert' => '%d users have pending limits to approve.',
+                'problem_users_alert' => '%d users have detected issues. First: %s',
                 'status' => 'Status',
                 'user' => 'User',
                 'problems' => 'Problems',
@@ -1023,12 +1155,25 @@ class AdminUsersController extends Controller {
                 'delete' => 'Delete',
                 'type_email_to_delete' => 'Type email to delete',
                 'delete_warning' => 'Delete is irreversible and removes all user data.',
+                'send_password_reset_link' => 'Send password reset link',
+                'password_reset_link_sent' => 'Password reset link sent.',
+                'password_reset_link_failed' => 'Could not send the password reset link.',
+                'invalid_email_address' => 'User does not have a valid e-mail address.',
+                'user_not_found' => 'User not found.',
+                'password_reset_link_rate_limited' => 'Password reset link was already sent recently. Try again in %d minutes.',
+                'confirm_password_reset_prompt' => 'Send password reset link to %s (%s)?',
+                'confirm_password_reset_force_prompt' => 'Force send password reset link to %s (%s) and override cooldown?',
+                'send_password_reset_link_force' => 'Send anyway',
+                'send_password_reset_link_short' => 'Reset',
+                'send_password_reset_link_force_short' => 'Reset anyway',
             ],
             'pl' => [
                 'dashboard' => 'Dashboard',
                 'dashboard_title' => 'SUPLA Admin - Dashboard',
                 'admins_menu' => 'Admini',
                 'admin_history_menu' => 'Historia adminów',
+                'system_health' => 'Stan systemu',
+                'backup_restore' => 'Backup / Restore',
                 'title_users' => 'SUPLA Admin - Uzytkownicy',
                 'account' => 'Konto',
                 'lp' => 'Lp.',
@@ -1057,7 +1202,31 @@ class AdminUsersController extends Controller {
                 'pending_accounts' => 'Konta oczekujące na potwierdzenie',
                 'blocked_users' => 'Zablokowani użytkownicy',
                 'pending_limit_approvals' => 'Oczekujące akceptacje limitów',
+                'registration_block' => 'Blokada rejestracji',
+                'registration_blocked_summary' => 'Rejestracja nowych kont użytkowników jest zablokowana.',
+                'registration_allowed_summary' => 'Rejestracja nowych kont użytkowników jest dozwolona.',
+                'registration_blocked_state' => 'Rejestracja jest zablokowana',
+                'registration_allowed_state' => 'Rejestracja jest dozwolona',
+                'registration_block_banner_title' => 'Sterowanie rejestracją',
+                'registration_block_banner_subtitle' => 'Konta i limity',
+                'registration_block_banner_hint' => 'Przełącznik znajduje się niżej. Przejdź tam, aby zmienić status.',
+                'registration_block_banner_action' => 'Przejdź do przełącznika',
+                'registration_block_hint' => 'Użyj tego przełącznika, aby sterować możliwością rejestracji nowych użytkowników.',
+                'registration_allow' => 'Odblokuj rejestrację',
+                'registration_changed_at' => 'Zmieniono',
+                'registration_changed_by' => 'Zmienił',
+                'registration_message' => 'Komunikat',
+                'registration_blocked_saved' => 'Rejestracja zablokowana.',
+                'registration_allowed_saved' => 'Rejestracja dozwolona.',
+                'registration_block_success_notice' => 'Status rejestracji został zaktualizowany.',
+                'registration_block_superadmin_only' => 'Tylko superadmin może zmieniać blokadę rejestracji.',
                 'recent_admin_security_events' => 'Ostatnie zdarzenia bezpieczeństwa admina',
+                'alerts_title' => 'Alerty admina',
+                'no_alerts' => 'Brak aktywnych alertów.',
+                'open' => 'Otwórz',
+                'blocked_users_alert' => 'Wymaga uwagi: %d zablokowanych użytkowników.',
+                'pending_limits_alert' => '%d użytkowników ma oczekujące limity do akceptacji.',
+                'problem_users_alert' => 'Wykryto problemy u %d użytkowników. Pierwszy: %s',
                 'status' => 'Status',
                 'user' => 'Użytkownik',
                 'problems' => 'Problemy',
@@ -1116,6 +1285,17 @@ class AdminUsersController extends Controller {
                 'delete' => 'Usun',
                 'type_email_to_delete' => 'Wpisz email aby usunac',
                 'delete_warning' => 'Usuniecie jest nieodwracalne i usuwa wszystkie dane uzytkownika.',
+                'send_password_reset_link' => 'Wyslij link do resetu hasla',
+                'password_reset_link_sent' => 'Link do resetu hasla zostal wyslany.',
+                'password_reset_link_failed' => 'Nie udalo sie wyslac linku do resetu hasla.',
+                'invalid_email_address' => 'Uzytkownik nie ma prawidlowego adresu e-mail.',
+                'user_not_found' => 'Nie znaleziono uzytkownika.',
+                'password_reset_link_rate_limited' => 'Link resetu hasla zostal juz wyslany niedawno. Sprobuj ponownie za %d minut.',
+                'confirm_password_reset_prompt' => 'Wyslac link resetu hasla do %s (%s)?',
+                'confirm_password_reset_force_prompt' => 'Wymusic wyslanie linku resetu hasla do %s (%s) i pominac cooldown?',
+                'send_password_reset_link_force' => 'Wyslij mimo to',
+                'send_password_reset_link_short' => 'Reset',
+                'send_password_reset_link_force_short' => 'Reset mimo to',
             ],
         ];
         $lang = isset($dict[$locale]) ? $locale : 'pl';
@@ -1129,8 +1309,9 @@ class AdminUsersController extends Controller {
      * @param User[] $recentUsers
      * @param User[] $pendingUsers
      * @param string[] $securityEvents
+     * @param array<int, array{level:string,title:string,message:string,link?:string}> $alerts
      */
-    private function renderDashboardHtml(array $stats, array $recentUsers, array $pendingUsers, array $blockedUsers, array $pendingLimitUsers, array $problemUsers, array $securityEvents, array $registrationSeries, array $authFailureSeries, string $msg, string $err, string $locale, string $searchQuery): string {
+    private function renderDashboardHtml(array $stats, array $recentUsers, array $pendingUsers, array $blockedUsers, array $pendingLimitUsers, array $problemUsers, array $securityEvents, array $registrationSeries, array $authFailureSeries, array $registrationState, array $alerts, string $msg, string $err, string $locale, string $searchQuery): string {
         $escape = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $canWrite = $this->isGranted('ROLE_ADMIN_OPERATOR') || $this->isGranted('ROLE_ADMIN_SUPER');
         $tr = $this->translator($locale);
@@ -1140,6 +1321,22 @@ class AdminUsersController extends Controller {
         }
         if ($err !== '') {
             $notice .= '<div class="notice bad">' . $escape($err) . '</div>';
+        }
+
+        $alertsHtml = '';
+        foreach ($alerts as $alert) {
+            $level = in_array((string)($alert['level'] ?? 'warn'), ['ok', 'warn', 'bad'], true) ? (string)$alert['level'] : 'warn';
+            $title = (string)($alert['title'] ?? '');
+            $message = (string)($alert['message'] ?? '');
+            $link = (string)($alert['link'] ?? '');
+            $alertsHtml .= '<div class="alert ' . $escape($level) . '"><b>' . $escape($title) . ':</b> ' . $escape($message);
+            if ($link !== '') {
+                $alertsHtml .= ' <a href="' . $escape($link) . '">' . $escape($tr('open')) . '</a>';
+            }
+            $alertsHtml .= '</div>';
+        }
+        if ($alertsHtml === '') {
+            $alertsHtml = '<div class="alert ok">' . $escape($tr('no_alerts')) . '</div>';
         }
 
         $statsHtml = '';
@@ -1216,34 +1413,19 @@ class AdminUsersController extends Controller {
             . $this->renderBarChart($authFailureSeries, '#b00020', $tr('failures_suffix'), $tr('chart_range'), $tr('chart_max_day'), $tr('chart_total'))
             . '</div>';
 
-        $adminNav = $this->isGranted('ROLE_ADMIN_SUPER') ? ' | <a href="/admin/admins">' . $escape($tr('admins_menu')) . '</a> | <a href="/admin/admin-history">' . $escape($tr('admin_history_menu')) . '</a>' : '';
-
-        return '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('dashboard_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:6px 0 14px 0;}'
-            . '.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:12px 0 18px 0;}'
-            . '.stat,.card{background:#fff;border:1px solid #e2e2e2;border-radius:12px;padding:14px;}'
-            . '.stat .label{font-size:12px;color:#666;margin-bottom:6px;}'
-            . '.stat .value{font-size:28px;font-weight:700;}'
-            . '.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;}'
-            . 'table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:13px;}th{background:#fafafa;}'
-            . '.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;}'
-            . '.notice{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:13px;}'
-            . '.notice.ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;}'
-            . '.notice.bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;}'
-            . '.chart{width:100%;height:auto;display:block;}'
-            . '.chart-meta{display:flex;justify-content:space-between;gap:12px;color:#666;font-size:12px;margin-top:8px;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . '.copy-btn{margin-left:6px;width:26px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;vertical-align:middle;}'
-            . '.copy-btn.copied{background:#e7f6ee;border-color:#bfe8cf;color:#0b7a3a;}'
-            . '@media (max-width:900px){.columns{grid-template-columns:1fr;}}'
-            . '</style></head><body>'
-            . '<div class="top"><div><a href="/admin/dashboard" style="font-weight:700;">' . $escape($tr('dashboard')) . '</a> | <a href="/admin/users">' . $escape($tr('title_users')) . '</a>' . $adminNav . ' | <a href="/admin/dashboard?lang=pl" style="' . ($locale === 'pl' ? 'font-weight:700;' : '') . '">Polski</a> | <a href="/admin/dashboard?lang=en" style="' . ($locale === 'en' ? 'font-weight:700;' : '') . '">English</a></div><div><a href="/admin/account">' . $escape($tr('account')) . '</a> | <a href="/admin/security-log">' . $escape($tr('security_log')) . '</a> | <a href="/admin/logout">' . $escape($tr('logout')) . '</a></div></div>'
+        $html = $this->adminUiLayoutOpen(
+            $escape($tr('dashboard_title')),
+            'dashboard',
+            $this->isGranted('ROLE_ADMIN_SUPER'),
+            '.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:10px 0 14px 0;}.stat .label{font-size:11px;color:#5b6570;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}.stat .value{font-size:26px;font-weight:750;letter-spacing:-0.02em;}.columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}.alert-wrap{margin:10px 0 14px 0;}.alert{padding:9px 11px;border-radius:10px;margin:7px 0;font-size:13px;border:1px solid transparent;}.alert.ok{background:#e7f6ee;color:#0b7a3a;border-color:#bfe8cf;}.alert.warn{background:#fff4db;color:#8a5a00;border-color:#f0d18a;}.alert.bad{background:#fdecee;color:#b00020;border-color:#f2b8bf;}.chart{width:100%;height:auto;display:block;}.chart-meta{display:flex;justify-content:space-between;gap:12px;color:#666;font-size:12px;margin-top:8px;}.ui-page-tools{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px 0;flex-wrap:wrap;}.ui-page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}.registration-tile{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border-left:4px solid #0b7a3a;background:linear-gradient(180deg,#f5fbf7 0%,#fff 100%);}.registration-tile.blocked{border-left-color:#b00020;background:linear-gradient(180deg,#fff7f7 0%,#fff 100%);box-shadow:0 8px 26px rgba(176,0,32,.08);}.registration-tile .badge{font-size:11px;font-weight:800;}.registration-tile .tile-main{min-width:220px;flex:1 1 320px;}.registration-tile .tile-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0b7a3a;margin:0 0 6px 0;}.registration-tile.blocked .tile-title{color:#b00020;}.registration-tile .tile-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}.registration-tile .tile-head strong{font-size:15px;}.registration-tile .tile-summary{font-size:13px;font-weight:600;}.registration-tile .tile-hint{margin-top:4px;color:#666;font-size:12px;max-width:52rem;}.registration-tile .tile-action{display:inline-block;text-decoration:none;padding:8px 12px;border-radius:10px;background:#0b7a3a;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(11,122,58,.2);}.registration-tile.blocked .tile-action{background:#b00020;box-shadow:0 4px 14px rgba(176,0,32,.2);}'
+        );
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted">Dashboard overview and quick access to all admin sections.</div>'
+            . '<div class="ui-page-actions"><a href="/admin/account">' . $escape($tr('account')) . '</a><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
+            . '</div>'
             . '<h1>' . $escape($tr('dashboard_title')) . '</h1>'
             . $notice
+            . '<div class="card alert-wrap"><h3 style="margin:0 0 10px 0;font-size:16px;">' . $escape($tr('alerts_title')) . '</h3>' . $alertsHtml . '</div>'
             . '<form class="bar" method="get" action="/admin/users" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px 0;"><input name="q" placeholder="' . $escape($tr('search_email')) . '" value="' . $escape($searchQuery) . '" /><button type="submit">' . $escape($tr('search')) . '</button></form>'
             . '<div class="stats">' . $statsHtml . '</div>'
             . '<div class="columns">' . $chartsHtml . '</div>'
@@ -1256,7 +1438,122 @@ class AdminUsersController extends Controller {
             . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:16px;">' . $escape($tr('recent_admin_security_events')) . '</h3><table><thead><tr><th>' . $escape($tr('entry')) . '</th></tr></thead><tbody>' . $securityEventsHtml . '</tbody></table></div>'
             . '</div>'
             . $this->renderCopyCodeScript($tr('copied'))
-            . '</body></html>';
+            . $this->adminUiLayoutClose();
+        return $html;
+    }
+
+    /**
+     * @param array{blocked:bool,changedAt:?string,changedBy:?string,message:string} $state
+     */
+    private function renderRegistrationBlockTile(array $state, callable $tr, callable $escape): string {
+        $blocked = !empty($state['blocked']);
+        $summary = $blocked ? $tr('registration_blocked_summary') : $tr('registration_allowed_summary');
+        $statusLabel = $blocked ? $tr('registration_blocked_state') : $tr('registration_allowed_state');
+        $badgeClass = $blocked ? 'warn' : 'ok';
+        $tileClass = $blocked ? 'registration-tile blocked' : 'registration-tile';
+        $actionLabel = $blocked ? $tr('registration_block_banner_action') : $tr('registration_block_banner_action');
+
+        return '<div class="card section ' . $tileClass . '" style="margin:0 0 14px 0;">'
+            . '<div class="tile-main">'
+            . '<div class="tile-title">' . $escape($tr('registration_block_banner_title')) . '</div>'
+            . '<div class="tile-subtitle" style="font-size:12px;color:#5b6570;margin:-2px 0 4px 0;">' . $escape($tr('registration_block_banner_subtitle')) . '</div>'
+            . '<div class="tile-head">'
+            . '<strong>' . $escape($tr('registration_block')) . '</strong>'
+            . '<span class="badge ' . $badgeClass . '">' . $escape($statusLabel) . '</span>'
+            . '</div>'
+            . '<div class="tile-summary">' . $escape($summary) . '</div>'
+            . '<div class="tile-hint">' . $escape($tr('registration_block_banner_hint')) . '</div>'
+            . '</div>'
+            . '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+            . '<a href="#registration-block" class="tile-action">' . $escape($actionLabel) . '</a>'
+            . '</div>'
+            . '</div>';
+    }
+
+    /**
+     * @param array{blocked:bool,changedAt:?string,changedBy:?string,message:string} $state
+     */
+    private function renderRegistrationBlockCard(array $state, callable $tr, callable $escape): string {
+        $blocked = !empty($state['blocked']);
+        $summary = $blocked ? $tr('registration_blocked_summary') : $tr('registration_allowed_summary');
+        $changedAt = (string)($state['changedAt'] ?? '-');
+        $changedBy = (string)($state['changedBy'] ?? '-');
+        $message = (string)($state['message'] ?? '');
+        $buttonLabel = $blocked ? $tr('registration_allow') : $tr('registration_block');
+        $buttonClass = $blocked ? 'gray' : 'danger';
+        $actionValue = $blocked ? '0' : '1';
+        $canToggle = $this->isGranted('ROLE_ADMIN_SUPER');
+
+        $statusLabel = $blocked ? $tr('registration_blocked_state') : $tr('registration_allowed_state');
+        $accent = $blocked ? 'style="border-left:4px solid #b00020;background:linear-gradient(180deg,#fff 0%,#fff9f9 100%);"' : 'style="border-left:4px solid #0b7a3a;background:linear-gradient(180deg,#fff 0%,#f7fbf8 100%);"';
+
+        return '<div class="card section" id="registration-block" ' . $accent . '>'
+            . '<h3 style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;"><span>' . $escape($tr('registration_block')) . '</span><span class="badge ' . ($blocked ? 'warn' : 'ok') . '">' . $escape($blocked ? $tr('yes') : $tr('no')) . '</span></h3>'
+            . '<div class="summary" style="font-size:14px;font-weight:600;">' . $escape($statusLabel) . '</div>'
+            . '<div class="summary" style="margin-top:-2px;">' . $escape($summary) . '</div>'
+            . '<div class="hint" style="display:grid;gap:4px;border-top:1px solid rgba(0,0,0,.06);padding-top:10px;">'
+            . '<div><b>' . $escape($tr('registration_changed_at')) . ':</b> <span class="mono">' . $escape($changedAt) . '</span></div>'
+            . '<div><b>' . $escape($tr('registration_changed_by')) . ':</b> <span class="mono">' . $escape($changedBy) . '</span></div>'
+            . '<div><b>' . $escape($tr('registration_message')) . ':</b> ' . $escape($message) . '</div>'
+            . '</div>'
+            . ($canToggle
+                ? '<div style="margin-top:12px;color:#666;font-size:12px;">' . $escape($tr('registration_block_hint')) . '</div><form method="post" action="/admin/users/registration-block" style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+                    . '<input type="hidden" name="_token" value="' . $escape($this->csrfToken('admin_registration_block_toggle')) . '" />'
+                    . '<input type="hidden" name="blocked" value="' . $escape($actionValue) . '" />'
+                    . '<button type="submit" class="' . $buttonClass . '">' . $escape($buttonLabel) . '</button>'
+                    . '</form>'
+                : '<div style="margin-top:12px;color:#666;font-size:12px;">' . $escape($tr('registration_block_superadmin_only')) . '</div>')
+            . '</div>';
+    }
+
+    /**
+     * @param array<int, array{user: User, problems: string[]}> $problemUsers
+     * @param array<int, array{user: User, blockedUntil: int}> $blockedUsers
+     * @param array<int, array{user: User, pending: array}> $pendingLimitUsers
+     * @return array<int, array{level:string,title:string,message:string,link?:string}>
+     */
+    private function buildDashboardAlerts(array $stats, array $blockedUsers, array $pendingLimitUsers, array $problemUsers, string $locale): array {
+        $tr = $this->translator($locale);
+        $alerts = [];
+
+        if ((int)($stats['blocked'] ?? 0) > 0) {
+            $alerts[] = [
+                'level' => 'warn',
+                'title' => $tr('blocked_users'),
+                'message' => sprintf($tr('blocked_users_alert'), (int)$stats['blocked']),
+                'link' => '/admin/health',
+            ];
+        }
+
+        if ((int)($stats['pendingLimits'] ?? 0) > 0) {
+            $alerts[] = [
+                'level' => 'warn',
+                'title' => $tr('pending_limit_approvals'),
+                'message' => sprintf($tr('pending_limits_alert'), (int)$stats['pendingLimits']),
+                'link' => '/admin/health',
+            ];
+        }
+
+        if ($problemUsers) {
+            $firstProblem = $problemUsers[0];
+            $alerts[] = [
+                'level' => 'bad',
+                'title' => $tr('detected_issues'),
+                'message' => sprintf($tr('problem_users_alert'), count($problemUsers), (string)($firstProblem['user']->getEmail() ?? '')),
+                'link' => '/admin/health',
+            ];
+        }
+
+        if (!$alerts) {
+            $alerts[] = [
+                'level' => 'ok',
+                'title' => $tr('alerts_title'),
+                'message' => $tr('no_alerts'),
+                'link' => '/admin/health',
+            ];
+        }
+
+        return $alerts;
     }
 
     private function buildRecentRegistrationSeries(EntityManagerInterface $em, int $days): array {
@@ -1358,6 +1655,7 @@ class AdminUsersController extends Controller {
         $limitsLock = (bool)$user->getPreference(self::PREF_LIMITS_SELF_UPDATE_LOCKED, false);
         $actionQs = '?return=details';
         $canWrite = $this->isGranted('ROLE_ADMIN_OPERATOR') || $this->isGranted('ROLE_ADMIN_SUPER');
+        $canSuper = $this->isGranted('ROLE_ADMIN_SUPER');
         $canDelete = $this->isGranted('ROLE_ADMIN_SUPER');
 
         $notice = '';
@@ -1418,6 +1716,8 @@ class AdminUsersController extends Controller {
         $scheduleDays = $schedule ? $this->formatScheduleSummary($schedule, $locale) : '';
         $scheduleForm = '';
         $scheduleDeleteForm = '';
+        $resetConfirmPrompt = json_encode(sprintf($tr('confirm_password_reset_prompt'), $displayCode, (string)$user->getEmail()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $resetForceConfirmPrompt = json_encode(sprintf($tr('confirm_password_reset_force_prompt'), $displayCode, (string)$user->getEmail()), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if ($canWrite) {
             $presetOptions = [
                 'none' => ['label' => $tr('schedule_preset_none'), 'days' => [], 'from' => '', 'to' => ''],
@@ -1456,32 +1756,20 @@ class AdminUsersController extends Controller {
             }
         }
 
-        return '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
-            . '<title>' . $escape($tr('user_details_title')) . '</title>'
-            . '<style>'
-            . 'body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:18px;background:#f7f7f8;}'
-            . 'h1{margin:0 0 12px 0;font-size:20px;}'
-            . '.top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:6px 0 14px 0;}'
-            . '.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;}'
-            . '.card{background:#fff;border:1px solid #e2e2e2;border-radius:12px;padding:14px;margin-bottom:14px;}'
-            . '.actions{display:flex;gap:8px;flex-wrap:wrap;}'
-            . 'table{width:100%;border-collapse:collapse;}th,td{padding:8px;border-bottom:1px solid #eee;text-align:left;vertical-align:top;font-size:13px;}th{background:#fafafa;}'
-            . '.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;}'
-            . '.notice{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:13px;}'
-            . '.notice.ok{background:#e7f6ee;color:#0b7a3a;border:1px solid #bfe8cf;}'
-            . '.notice.bad{background:#fdecee;color:#b00020;border:1px solid #f2b8bf;}'
-            . 'input,select,button{font:inherit;padding:8px 10px;border:1px solid #ccc;border-radius:8px;background:#fff;}'
-            . 'button{cursor:pointer;}button.danger{background:#b00020;color:#fff;border-color:#b00020;}'
-            . 'a{color:#0b7a3a;text-decoration:none;}a:hover{text-decoration:underline;}'
-            . '.copy-btn{margin-left:6px;width:26px;height:26px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:6px;vertical-align:middle;}'
-            . '.copy-btn.copied{background:#e7f6ee;border-color:#bfe8cf;color:#0b7a3a;}'
-            . '@media (max-width:900px){.grid{grid-template-columns:1fr;}}'
-            . '</style></head><body>'
-            . '<div class="top"><div><a href="/admin/dashboard">Dashboard</a> | <a href="/admin/users">Uzytkownicy</a>' . ($this->isGranted('ROLE_ADMIN_SUPER') ? ' | <a href="/admin/admins">Admini</a> | <a href="/admin/admin-history">Historia adminów</a>' : '') . '</div><div><a href="/admin/account">Konto</a> | <a href="/admin/security-log">Log bezpieczenstwa</a> | <a href="/admin/logout">Wyloguj</a></div></div>'
+        $html = $this->adminUiLayoutOpen(
+            $escape($tr('user_details_title')),
+            'users',
+            $this->isGranted('ROLE_ADMIN_SUPER'),
+            '.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;}.copy-btn{margin-left:6px;width:28px;height:28px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:11px;border-radius:8px;vertical-align:middle;background:#fff;color:#0b7a3a;border-color:#d7e7db;}.copy-btn.copied{background:#e7f6ee;border-color:#bfe8cf;color:#0b7a3a;}.ui-page-tools{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px 0;flex-wrap:wrap;}.ui-page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}.ui-page-actions a{padding:6px 10px;border-radius:999px;background:#f6f8f9;border:1px solid #dfe5ea;text-decoration:none !important;}'
+        );
+        $html .= '<div class="ui-page-tools">'
+            . '<div class="ui-muted"><a href="/admin/users">← ' . $escape($tr('title_users')) . '</a></div>'
+            . '<div class="ui-page-actions"><a href="/admin/account">Konto</a><a href="/admin/security-log">Log bezpieczeństwa</a><a href="/admin/logout">Wyloguj</a></div>'
+            . '</div>'
             . '<h1>User: ' . $escape((string)$user->getEmail()) . '</h1>'
             . $notice
             . '<div class="grid"><div>'
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('account_section')) . '</h3><table><tbody>'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">' . $escape($tr('account_section')) . '</h3><table><tbody>'
             . '<tr><th>ID</th><td class="mono">' . $id . '</td></tr>'
             . '<tr><th>' . $escape($tr('user_code_label')) . '</th><td class="mono">' . $escape($displayCode) . $this->renderCopyCodeButton($displayCode, $tr('copy')) . '</td></tr>'
             . '<tr><th>Email</th><td>' . $escape((string)$user->getEmail()) . '</td></tr>'
@@ -1494,13 +1782,15 @@ class AdminUsersController extends Controller {
             . '<tr><th>Limits self-update</th><td>' . ($limitsLock ? 'locked' : 'allowed') . '</td></tr>'
             . '</tbody></table></div>'
             . $problemsHtml
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">Limits</h3><table><thead><tr><th>Field</th><th>Current</th><th>Pending</th></tr></thead><tbody>' . $limitsHtml . '</tbody></table></div>'
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('locations_section')) . '</h3><table><thead><tr><th>ID</th><th>Caption</th><th>Access IDs</th></tr></thead><tbody>' . $locationsHtml . '</tbody></table></div>'
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('access_ids_section')) . '</h3><table><thead><tr><th>ID</th><th>Locations</th></tr></thead><tbody>' . $accessIdsHtml . '</tbody></table></div>'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">Limits</h3><table><thead><tr><th>Field</th><th>Current</th><th>Pending</th></tr></thead><tbody>' . $limitsHtml . '</tbody></table></div>'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">' . $escape($tr('locations_section')) . '</h3><table><thead><tr><th>ID</th><th>Caption</th><th>Access IDs</th></tr></thead><tbody>' . $locationsHtml . '</tbody></table></div>'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">' . $escape($tr('access_ids_section')) . '</h3><table><thead><tr><th>ID</th><th>Locations</th></tr></thead><tbody>' . $accessIdsHtml . '</tbody></table></div>'
             . '</div><div>'
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">Actions</h3><div class="actions">'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">Actions</h3><div class="actions">'
             . ($canWrite ? (
-                ($user->isEnabled()
+                '<form method="post" action="/admin/users/' . $id . '/reset-password' . $actionQs . '" onsubmit="return confirm(' . $resetConfirmPrompt . ');">' . $this->csrfField('admin_user_reset_password_' . $id) . '<button type="submit">' . $escape($tr('send_password_reset_link')) . '</button></form>'
+                . ($canSuper ? '<form method="post" action="/admin/users/' . $id . '/reset-password' . $actionQs . '" onsubmit="return confirm(' . $resetForceConfirmPrompt . ');">' . $this->csrfField('admin_user_reset_password_' . $id) . '<input type="hidden" name="force" value="1" /><button type="submit">' . $escape($tr('send_password_reset_link_force')) . '</button></form>' : '')
+                . ($user->isEnabled()
                     ? '<form method="post" action="/admin/users/' . $id . '/toggle-enabled' . $actionQs . '">' . $this->csrfField('admin_user_toggle_enabled_' . $id) . '<button type="submit">Disable</button></form>'
                     : '<form method="post" action="/admin/users/' . $id . '/confirm' . $actionQs . '">' . $this->csrfField('admin_user_confirm_' . $id) . '<button type="submit">Confirm account</button></form>')
                 . '<form method="post" action="/admin/users/' . $id . '/' . ($blockedNow ? 'unblock' : 'block') . $actionQs . '">' . $this->csrfField('admin_user_' . ($blockedNow ? 'unblock_' : 'block_') . $id)
@@ -1510,13 +1800,14 @@ class AdminUsersController extends Controller {
                 . (is_array($pending) ? '<form method="post" action="/admin/users/' . $id . '/limits/approve' . $actionQs . '">' . $this->csrfField('admin_user_approve_limits_' . $id) . '<button type="submit">Approve limits</button></form><form method="post" action="/admin/users/' . $id . '/limits/reject' . $actionQs . '">' . $this->csrfField('admin_user_reject_limits_' . $id) . '<button type="submit">Reject limits</button></form>' : '')
             ) : '<span style="color:#666;">read-only</span>')
             . '</div></div>'
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('block_history')) . '</h3><table><thead><tr><th>' . $escape($tr('registered')) . '</th><th>' . $escape($tr('event')) . '</th><th>' . $escape($tr('block_scopes')) . '</th><th>' . $escape($tr('blocked_until')) . '</th><th>' . $escape($tr('block_reason')) . '</th><th>Admin</th></tr></thead><tbody>' . $blockHistoryHtml . '</tbody></table></div>'
-            . ($canDelete ? '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">Delete user</h3><form method="post" action="/admin/users/' . $id . '/delete' . $actionQs . '">' . $this->csrfField('admin_user_delete_' . $id) . '<input name="confirmEmail" placeholder="Type exact email to delete" value="" style="min-width:100%;box-sizing:border-box;margin-bottom:8px;" /><button type="submit" class="danger">Delete</button></form></div>' : '')
-            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;">' . $escape($tr('schedule_block')) . '</h3>' . ($schedule ? '<div style="margin-bottom:8px;color:#333;">' . $escape($scheduleDays) . '</div>' : '') . $scheduleForm . $scheduleDeleteForm . '</div>'
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">' . $escape($tr('block_history')) . '</h3><table><thead><tr><th>' . $escape($tr('registered')) . '</th><th>' . $escape($tr('event')) . '</th><th>' . $escape($tr('block_scopes')) . '</th><th>' . $escape($tr('blocked_until')) . '</th><th>' . $escape($tr('block_reason')) . '</th><th>Admin</th></tr></thead><tbody>' . $blockHistoryHtml . '</tbody></table></div>'
+            . ($canDelete ? '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">Delete user</h3><form method="post" action="/admin/users/' . $id . '/delete' . $actionQs . '">' . $this->csrfField('admin_user_delete_' . $id) . '<input name="confirmEmail" placeholder="Type exact email to delete" value="" style="min-width:100%;box-sizing:border-box;margin-bottom:8px;" /><button type="submit" class="danger">Delete</button></form></div>' : '')
+            . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:15px;letter-spacing:-0.01em;">' . $escape($tr('schedule_block')) . '</h3>' . ($schedule ? '<div style="margin-bottom:8px;color:#333;">' . $escape($scheduleDays) . '</div>' : '') . $scheduleForm . $scheduleDeleteForm . '</div>'
             . '</div></div>'
             . '<script>(function(){document.addEventListener("change",function(event){var select=event.target.closest(".schedule-preset");if(!select){return;}var form=select.form;if(!form){return;}var option=select.options[select.selectedIndex];var days=(option.getAttribute("data-days")||"").split(",").filter(Boolean);form.querySelectorAll(".schedule-day").forEach(function(input){input.checked=days.indexOf(input.value)!==-1;});var from=option.getAttribute("data-from")||"";var to=option.getAttribute("data-to")||"";var fromInput=form.querySelector(".schedule-from");var toInput=form.querySelector(".schedule-to");if(fromInput&&from){fromInput.value=from;}if(toInput&&to){toInput.value=to;}});})();</script>'
             . $this->renderCopyCodeScript($tr('copied'))
-            . '</body></html>';
+            . $this->adminUiLayoutClose();
+        return $html;
     }
 
     /**

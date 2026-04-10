@@ -727,6 +727,7 @@ const De = P(Fe, [
                 pendingLimits: null,
                 accountBlocking: null,
                 accountLimitsSelfUpdateLocked: !1,
+                fetchError: "",
                 currentTab: "features",
                 draftLimits: {},
                 draftApiRateLimit: ""
@@ -777,10 +778,16 @@ const De = P(Fe, [
                 this.resetDraft(), this.currentTab = "features"
             },
             fetchLimits() {
-                this.fetching || this.saving || (this.fetching = !0, M.get("users/current?include=limits,relationsCount").then(a => this.applyUserData(a.body)).finally(() => this.fetching = !1))
+                this.fetching || this.saving || (this.fetching = !0, this.fetchError = "", M.get("users/current?include=limits,relationsCount").then(a => this.applyUserData(a.body)).catch(a => {
+                    const s = a && a.status ? `HTTP ${a.status}` : "HTTP ?";
+                    const f = a && a.body;
+                    const w = f && (f.message || f.error || f.details) ? String(f.message || f.error || f.details) : "";
+                    this.fetchError = w ? `Nie udało się pobrać limitów (${s}): ${w}` : `Nie udało się pobrać limitów (${s}). Sprawdź, czy serwer SUPLA działa i spróbuj ponownie.`;
+                    this.limits = void 0, this.relationsCount = void 0, this.apiRateStatus = void 0, this.pendingLimits = null, this.accountBlocking = null, this.accountLimitsSelfUpdateLocked = !1
+                }).finally(() => this.fetching = !1))
             },
             applyUserData(a) {
-                this.limits = {
+                this.fetchError = "", this.limits = {
                     ...a.limits,
                     apiRateLimit: a.apiRateLimit
                 }, this.relationsCount = a.relationsCount, this.pendingLimits = a.pendingLimits || null, this.accountBlocking = a.accountBlocking || null, this.accountLimitsSelfUpdateLocked = !!a.accountLimitsSelfUpdateLocked, this.apiRateStatus = this.limits.apiRateLimit ? {
@@ -1011,6 +1018,12 @@ const De = P(Fe, [
     },
     utt = {
         class: "mb-2"
+    },
+    xt = {
+        class: "alert alert-danger my-3",
+        style: {
+            "white-space": "pre-wrap"
+        }
     };
 
 function ftt(a, s, f, w, r, A) {
@@ -1051,7 +1064,7 @@ function ftt(a, s, f, w, r, A) {
         default: E(() => [v(u, {
             loading: r.fetching || r.saving
         }, {
-            default: E(() => [r.limits ? (m(), y("div", ze, [i("div", Ke, [i("ul", He, [i("li", {
+            default: E(() => [r.fetchError ? (m(), y("div", xt, c(r.fetchError), 1)) : b("", !0), r.limits ? (m(), y("div", ze, [i("div", Ke, [i("ul", He, [i("li", {
                 class: C({
                     active: r.currentTab === "features"
                 })

@@ -23,6 +23,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use SuplaBundle\EventListener\UnavailableInMaintenance;
+use SuplaBundle\Security\RegistrationBlockStore;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -153,9 +154,19 @@ class DefaultController extends AbstractController {
      * @Template()
      * @Cache(expires="2016-01-01")
      */
-    public function spaBoilerplateAction($suffix = null) {
+    public function spaBoilerplateAction(Request $request, RegistrationBlockStore $registrationBlockStore, $suffix = null) {
         if ($suffix && preg_match('#\..{2,4}$#', $suffix)) {
             throw new NotFoundHttpException("$suffix file could not be found");
+        }
+        if ($request->getPathInfo() === '/register' && $registrationBlockStore->isBlocked()) {
+            return new Response(
+                '<!doctype html><html><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />'
+                . '<title>Rejestracja zablokowana</title>'
+                . '<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f5faf7 0,#eef3f6 100%);color:#18212a;padding:24px;}.card{max-width:720px;width:100%;background:#fff;border:1px solid #dfe5ea;border-radius:24px;box-shadow:0 20px 60px rgba(16,24,40,.10);padding:28px;}.brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em;color:#18212a;text-decoration:none;}.mark{width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b7a3a 0,#22a65b 100%);color:#fff;}.title{font-size:26px;line-height:1.1;margin:18px 0 10px 0;}.msg{font-size:16px;line-height:1.6;color:#33414d;white-space:pre-line;}.actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid #0b7a3a;background:#0b7a3a;color:#fff;text-decoration:none;font-weight:700;}.btn.secondary{background:#f6f8f9;color:#18212a;border-color:#dfe5ea;}</style>'
+                . '</head><body><div class="card"><a class="brand" href="/"><span class="mark">S</span><span>SUPLA</span></a><div class="title">Rejestracja nowych kont jest zablokowana</div><div class="msg">' . htmlspecialchars($registrationBlockStore->getBlockedMessage(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div><div class="actions"><a class="btn" href="/auth/login">Przejdź do logowania</a><a class="btn secondary" href="/">' . 'Strona główna' . '</a></div></div></body></html>',
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8']
+            );
         }
     }
 }

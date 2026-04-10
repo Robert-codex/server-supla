@@ -75,6 +75,7 @@ services:
     $requireRegulationsAcceptance: '%supla_require_regulations_acceptance%'
     $availableLanguages: '%supla.available_languages%'
     $accountsRegistrationEnabled: '%supla.accounts_registration_enabled%'
+    $registrationBlockStore: '@SuplaBundle\Security\RegistrationBlockStore'
     $accountLimitsEditingEnabled: '%supla.account_limits.self_update_enabled%'
     $mqttBrokerEnabled: '%supla.mqtt_broker.enabled%'
     $mqttAuthEnabled: '%supla.mqtt_broker.integrated_auth%'
@@ -174,6 +175,8 @@ services:
   SuplaBundle\Auth\UserProvider: ~
   SuplaBundle\Auth\SuplaAccessTokenManager: ~
   SuplaBundle\Security\AdminPanelAccountStore: ~
+  SuplaBundle\Security\AdminBackupScheduleStore: ~
+  SuplaBundle\Security\RegistrationBlockStore: ~
   SuplaBundle\Security\AdminPanelUserProvider: ~
   SuplaBundle\EventListener\AdminPanelTwoFactorEnforcer:
     tags:
