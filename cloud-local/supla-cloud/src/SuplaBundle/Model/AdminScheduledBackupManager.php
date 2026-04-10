@@ -4,15 +4,18 @@ namespace SuplaBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
+use SuplaBundle\Mailer\SuplaMailer;
 use SuplaBundle\Security\AdminBackupScheduleStore;
 use SuplaBundle\Security\AdminPanelAccountStore;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Mime\Email;
 
 class AdminScheduledBackupManager {
     public function __construct(
         private ParameterBagInterface $params,
         private AdminBackupScheduleStore $scheduleStore,
-        private AdminPanelAccountStore $auditStore
+        private AdminPanelAccountStore $auditStore,
+        private SuplaMailer $mailer
     ) {
     }
 
@@ -143,7 +146,6 @@ class AdminScheduledBackupManager {
             return;
         }
 
-        $to = implode(', ', array_keys($recipients));
         $subject = 'SUPLA Admin: scheduled backup failed';
         $body = implode("\n", [
             'A scheduled backup failed on the SUPLA admin panel.',
@@ -156,8 +158,12 @@ class AdminScheduledBackupManager {
             'Message: ' . $message,
             'Time: ' . $this->nowIso(),
         ]);
-
-        @mail($to, $subject, $body);
+        foreach (array_keys($recipients) as $recipient) {
+            $this->mailer->send((new Email())
+                ->to($recipient)
+                ->subject($subject)
+                ->text($body));
+        }
     }
 
     /**

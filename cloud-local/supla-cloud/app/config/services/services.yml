@@ -178,6 +178,9 @@ services:
   SuplaBundle\Security\AdminBackupScheduleStore: ~
   SuplaBundle\Security\RegistrationBlockStore: ~
   SuplaBundle\Security\AdminPanelUserProvider: ~
+  SuplaBundle\Model\AdminScheduledBackupManager:
+    arguments:
+      $mailer: '@SuplaBundle\Mailer\SuplaMailer'
   SuplaBundle\EventListener\AdminPanelTwoFactorEnforcer:
     tags:
       - {name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
