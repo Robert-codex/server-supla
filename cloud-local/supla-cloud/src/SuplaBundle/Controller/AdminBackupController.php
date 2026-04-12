@@ -130,10 +130,10 @@ class AdminBackupController extends Controller {
             $historyRows = '<tr><td colspan="4" style="color:#666;">' . $escape($tr('no_history')) . '</td></tr>';
         }
 
-        $html .= '<div class="card"><h3 style="margin:0 0 10px 0;font-size:16px;">' . $escape($tr('history_card')) . '</h3>'
-            . '<div class="hint" style="margin-bottom:10px;">' . $escape($tr('history_help')) . '</div>'
+        $html .= '<div class="card"><details><summary style="display:flex;justify-content:space-between;gap:10px;align-items:center;cursor:pointer;"><span>' . $escape($tr('history_card')) . '</span><span style="font-size:12px;color:#5b6570;">' . $escape($tr('history_summary')) . '</span></summary>'
+            . '<div class="hint" style="margin:10px 0;">' . $escape($tr('history_help')) . '</div>'
             . '<table><thead><tr><th>' . $escape($tr('when')) . '</th><th>' . $escape($tr('event')) . '</th><th>' . $escape($tr('admin_actor')) . '</th><th>' . $escape($tr('details')) . '</th></tr></thead><tbody>' . $historyRows . '</tbody></table>'
-            . '</div>';
+            . '</details></div>';
 
         $html .= $this->adminUiLayoutClose();
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
@@ -917,6 +917,7 @@ class AdminBackupController extends Controller {
                 'backup_schedule_help' => 'Automatyczne backupy są konfigurowane na osobnej stronie i uruchamiane przez cron.',
                 'open_scheduler' => 'Otwórz harmonogram backupów',
                 'history_card' => 'Historia backupów',
+                'history_summary' => 'kliknij, aby rozwinąć',
                 'history_help' => 'Ostatnie operacje backup/restore/import/export zapisane w logu admina.',
                 'no_history' => 'Brak wpisów historii backupu.',
                 'when' => 'Kiedy',
@@ -963,6 +964,7 @@ class AdminBackupController extends Controller {
                 'backup_schedule_help' => 'Automatic backups are configured on a separate page and executed by cron.',
                 'open_scheduler' => 'Open backup scheduler',
                 'history_card' => 'Backup history',
+                'history_summary' => 'click to expand',
                 'history_help' => 'Recent backup/restore/import/export operations recorded in the admin audit log.',
                 'no_history' => 'No backup history entries.',
                 'when' => 'When',

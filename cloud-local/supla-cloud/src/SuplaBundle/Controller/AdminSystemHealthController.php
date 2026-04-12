@@ -182,12 +182,12 @@ class AdminSystemHealthController extends Controller {
             . '<div class="health-panel"><h3>' . $escape($tr('alerts_title')) . '</h3>' . $alertsHtml . '</div>'
             . '<div class="health-panel"><h3>' . $escape($tr('blocked_users_title')) . '</h3><div class="health-table-wrap"><table class="health-table"><thead><tr><th>' . $escape($tr('user')) . '</th><th>' . $escape($tr('details')) . '</th></tr></thead><tbody>' . $blockedRows . '</tbody></table></div></div>'
             . '</div>'
-            . '<div class="health-panel section"><div class="health-log-head"><h3 style="margin:0;">' . $escape($tr('password_reset_log_title')) . '</h3><div class="health-filter">'
+            . '<div class="health-panel section"><details class="health-password-log"><summary style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;cursor:pointer;"><span>' . $escape($tr('password_reset_log_title')) . '</span><span style="font-size:12px;color:#5b6570;">' . $escape($tr('password_reset_log_summary')) . '</span></summary><div class="health-log-head" style="margin-top:10px;"><div class="health-filter">'
             . $this->renderPasswordResetLogFilterLink('/admin/system-health', $resetLogRange, 'all', $tr('password_reset_log_filter_all'), $escape)
             . $this->renderPasswordResetLogFilterLink('/admin/system-health', $resetLogRange, '24h', $tr('password_reset_log_filter_24h'), $escape)
             . $this->renderPasswordResetLogFilterLink('/admin/system-health', $resetLogRange, '7d', $tr('password_reset_log_filter_7d'), $escape)
             . $this->renderPasswordResetLogFilterLink('/admin/system-health', $resetLogRange, '30d', $tr('password_reset_log_filter_30d'), $escape)
-            . '</div></div>' . $this->renderPasswordResetLog($passwordResetRequests, $escape, $tr) . '</div>'
+            . '</div></div>' . $this->renderPasswordResetLog($passwordResetRequests, $escape, $tr) . '</details></div>'
             . $this->adminUiLayoutClose();
 
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);

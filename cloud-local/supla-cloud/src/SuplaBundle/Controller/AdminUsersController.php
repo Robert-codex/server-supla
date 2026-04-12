@@ -1040,6 +1040,17 @@ class AdminUsersController extends Controller {
             'en' => [
                 'dashboard' => 'Dashboard',
                 'dashboard_title' => 'SUPLA Admin - Dashboard',
+                'dashboard_overview_hint' => 'Quick view of the panel state and shortcuts to common tasks.',
+                'dashboard_alerts_hint' => 'Items requiring attention.',
+                'dashboard_overview_subtitle' => 'Most important numbers',
+                'overview_title' => 'Overview',
+                'quick_actions' => 'Quick actions',
+                'dashboard_quick_hint' => 'Jump to the most used sections.',
+                'dashboard_quick_users' => 'User list, limits and blocks.',
+                'dashboard_quick_health' => 'DB, MQTT, cron, disk and SSL.',
+                'dashboard_quick_backup' => 'Backup / Restore and exports.',
+                'dashboard_quick_scheduler' => 'Scheduled backup automation.',
+                'scheduler_title' => 'Scheduler',
                 'admins_menu' => 'Admins',
                 'admin_history_menu' => 'Admin history',
                 'system_health' => 'System health',
@@ -1170,6 +1181,17 @@ class AdminUsersController extends Controller {
             'pl' => [
                 'dashboard' => 'Dashboard',
                 'dashboard_title' => 'SUPLA Admin - Dashboard',
+                'dashboard_overview_hint' => 'Szybki podgląd stanu panelu i skróty do najczęstszych operacji.',
+                'dashboard_alerts_hint' => 'Rzeczy wymagające uwagi.',
+                'dashboard_overview_subtitle' => 'Najważniejsze liczby',
+                'overview_title' => 'Przegląd',
+                'quick_actions' => 'Skróty',
+                'dashboard_quick_hint' => 'Przejścia do najczęściej używanych sekcji.',
+                'dashboard_quick_users' => 'Lista użytkowników, limity i blokady.',
+                'dashboard_quick_health' => 'DB, MQTT, cron, dysk i SSL.',
+                'dashboard_quick_backup' => 'Backup / Restore oraz eksporty.',
+                'dashboard_quick_scheduler' => 'Harmonogram automatycznych backupów.',
+                'scheduler_title' => 'Harmonogram',
                 'admins_menu' => 'Admini',
                 'admin_history_menu' => 'Historia adminów',
                 'system_health' => 'Stan systemu',
@@ -1405,6 +1427,20 @@ class AdminUsersController extends Controller {
             $securityEventsHtml = '<tr><td style="color:#666;">' . $escape($tr('no_security_events')) . '</td></tr>';
         }
 
+        $quickActionsHtml = ''
+            . '<a class="quick-action" href="/admin/users"><strong>' . $escape($tr('recent_users')) . '</strong><span>' . $escape($tr('dashboard_quick_users')) . '</span></a>'
+            . '<a class="quick-action" href="/admin/health"><strong>' . $escape($tr('system_health')) . '</strong><span>' . $escape($tr('dashboard_quick_health')) . '</span></a>'
+            . '<a class="quick-action" href="/admin/backup"><strong>' . $escape($tr('backup_restore')) . '</strong><span>' . $escape($tr('dashboard_quick_backup')) . '</span></a>'
+            . '<a class="quick-action" href="/admin/backup/scheduler"><strong>' . $escape($tr('scheduler_title')) . '</strong><span>' . $escape($tr('dashboard_quick_scheduler')) . '</span></a>';
+
+        $heroStatsHtml = ''
+            . '<div class="hero-stat"><span>' . $escape($tr('stats_total')) . '</span><b>' . $escape((string)($stats['total'] ?? 0)) . '</b></div>'
+            . '<div class="hero-stat"><span>' . $escape($tr('stats_enabled')) . '</span><b>' . $escape((string)($stats['enabled'] ?? 0)) . '</b></div>'
+            . '<div class="hero-stat"><span>' . $escape($tr('stats_blocked')) . '</span><b>' . $escape((string)($stats['blocked'] ?? 0)) . '</b></div>'
+            . '<div class="hero-stat"><span>' . $escape($tr('stats_pending_limits')) . '</span><b>' . $escape((string)($stats['pendingLimits'] ?? 0)) . '</b></div>';
+
+        $registrationSummary = $this->renderRegistrationBlockTile($registrationState, $tr, $escape);
+
         $chartsHtml = ''
             . '<div class="card"><h3 style="margin:0 0 10px 0;font-size:16px;">' . $escape($tr('chart_registrations')) . '</h3>'
             . $this->renderBarChart($registrationSeries, '#0b7a3a', $tr('registrations_suffix'), $tr('chart_range'), $tr('chart_max_day'), $tr('chart_total'))
@@ -1417,15 +1453,24 @@ class AdminUsersController extends Controller {
             $escape($tr('dashboard_title')),
             'dashboard',
             $this->isGranted('ROLE_ADMIN_SUPER'),
-            '.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:10px 0 14px 0;}.stat .label{font-size:11px;color:#5b6570;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}.stat .value{font-size:26px;font-weight:750;letter-spacing:-0.02em;}.columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}.alert-wrap{margin:10px 0 14px 0;}.alert{padding:9px 11px;border-radius:10px;margin:7px 0;font-size:13px;border:1px solid transparent;}.alert.ok{background:#e7f6ee;color:#0b7a3a;border-color:#bfe8cf;}.alert.warn{background:#fff4db;color:#8a5a00;border-color:#f0d18a;}.alert.bad{background:#fdecee;color:#b00020;border-color:#f2b8bf;}.chart{width:100%;height:auto;display:block;}.chart-meta{display:flex;justify-content:space-between;gap:12px;color:#666;font-size:12px;margin-top:8px;}.ui-page-tools{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px 0;flex-wrap:wrap;}.ui-page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}.registration-tile{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border-left:4px solid #0b7a3a;background:linear-gradient(180deg,#f5fbf7 0%,#fff 100%);}.registration-tile.blocked{border-left-color:#b00020;background:linear-gradient(180deg,#fff7f7 0%,#fff 100%);box-shadow:0 8px 26px rgba(176,0,32,.08);}.registration-tile .badge{font-size:11px;font-weight:800;}.registration-tile .tile-main{min-width:220px;flex:1 1 320px;}.registration-tile .tile-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0b7a3a;margin:0 0 6px 0;}.registration-tile.blocked .tile-title{color:#b00020;}.registration-tile .tile-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}.registration-tile .tile-head strong{font-size:15px;}.registration-tile .tile-summary{font-size:13px;font-weight:600;}.registration-tile .tile-hint{margin-top:4px;color:#666;font-size:12px;max-width:52rem;}.registration-tile .tile-action{display:inline-block;text-decoration:none;padding:8px 12px;border-radius:10px;background:#0b7a3a;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(11,122,58,.2);}.registration-tile.blocked .tile-action{background:#b00020;box-shadow:0 4px 14px rgba(176,0,32,.2);}'
+            '.dashboard-hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.9fr);gap:14px;margin:10px 0 14px 0;}.dashboard-hero .hero-panel,.dashboard-hero .hero-side{display:flex;flex-direction:column;gap:12px;}.dashboard-hero .hero-panel .alert-wrap{margin:0;}.dashboard-hero .hero-panel .alert{margin:8px 0 0 0;}.hero-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}.hero-stat{background:#fff;border:1px solid #e1e7ec;border-radius:14px;padding:12px 13px;box-shadow:0 1px 1px rgba(16,24,40,.03);}.hero-stat span{display:block;font-size:11px;color:#5b6570;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;}.hero-stat b{font-size:24px;line-height:1;letter-spacing:-0.03em;}.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.quick-action{display:flex;flex-direction:column;gap:6px;padding:12px 13px;border-radius:14px;background:linear-gradient(180deg,#fff 0,#f7fafb 100%);border:1px solid #dfe5ea;color:#18212a;text-decoration:none !important;box-shadow:0 1px 1px rgba(16,24,40,.03);}.quick-action strong{font-size:13px;}.quick-action span{font-size:12px;color:#5b6570;line-height:1.35;}.dashboard-section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 10px 0;flex-wrap:wrap;}.dashboard-section-title h3{margin:0;font-size:16px;letter-spacing:-0.01em;}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:10px 0 14px 0;}.stat .label{font-size:11px;color:#5b6570;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}.stat .value{font-size:26px;font-weight:750;letter-spacing:-0.02em;}.columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}.alert-wrap{margin:10px 0 14px 0;}.alert{padding:9px 11px;border-radius:10px;margin:7px 0;font-size:13px;border:1px solid transparent;}.alert.ok{background:#e7f6ee;color:#0b7a3a;border-color:#bfe8cf;}.alert.warn{background:#fff4db;color:#8a5a00;border-color:#f0d18a;}.alert.bad{background:#fdecee;color:#b00020;border-color:#f2b8bf;}.chart{width:100%;height:auto;display:block;}.chart-meta{display:flex;justify-content:space-between;gap:12px;color:#666;font-size:12px;margin-top:8px;}.ui-page-tools{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 14px 0;flex-wrap:wrap;}.ui-page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}.registration-tile{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;border-left:4px solid #0b7a3a;background:linear-gradient(180deg,#f5fbf7 0%,#fff 100%);}.registration-tile.blocked{border-left-color:#b00020;background:linear-gradient(180deg,#fff7f7 0%,#fff 100%);box-shadow:0 8px 26px rgba(176,0,32,.08);}.registration-tile .badge{font-size:11px;font-weight:800;}.registration-tile .tile-main{min-width:220px;flex:1 1 320px;}.registration-tile .tile-title{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0b7a3a;margin:0 0 6px 0;}.registration-tile.blocked .tile-title{color:#b00020;}.registration-tile .tile-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;}.registration-tile .tile-head strong{font-size:15px;}.registration-tile .tile-summary{font-size:13px;font-weight:600;}.registration-tile .tile-hint{margin-top:4px;color:#666;font-size:12px;max-width:52rem;}.registration-tile .tile-action{display:inline-block;text-decoration:none;padding:8px 12px;border-radius:10px;background:#0b7a3a;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(11,122,58,.2);}.registration-tile.blocked .tile-action{background:#b00020;box-shadow:0 4px 14px rgba(176,0,32,.2);}@media (max-width:960px){.dashboard-hero{grid-template-columns:1fr;}.hero-summary{grid-template-columns:repeat(2,minmax(0,1fr));}.quick-actions{grid-template-columns:1fr 1fr;}}@media (max-width:640px){.hero-summary{grid-template-columns:1fr;}.quick-actions{grid-template-columns:1fr;}.columns{grid-template-columns:1fr;}.stats{grid-template-columns:repeat(2,minmax(0,1fr));}.stat .value{font-size:22px;}.dashboard-section-title{align-items:flex-start;}}'
         );
         $html .= '<div class="ui-page-tools">'
-            . '<div class="ui-muted">Dashboard overview and quick access to all admin sections.</div>'
+            . '<div class="ui-muted">' . $escape($tr('dashboard_overview_hint')) . '</div>'
             . '<div class="ui-page-actions"><a href="/admin/account">' . $escape($tr('account')) . '</a><a href="/admin/security-log">' . $escape($tr('security_log')) . '</a><a href="/admin/logout">' . $escape($tr('logout')) . '</a></div>'
             . '</div>'
             . '<h1>' . $escape($tr('dashboard_title')) . '</h1>'
             . $notice
-            . '<div class="card alert-wrap"><h3 style="margin:0 0 10px 0;font-size:16px;">' . $escape($tr('alerts_title')) . '</h3>' . $alertsHtml . '</div>'
+            . '<div class="dashboard-hero">'
+            . '<div class="hero-panel">'
+            . '<div class="card alert-wrap"><div class="dashboard-section-title"><h3>' . $escape($tr('alerts_title')) . '</h3><span class="ui-muted">' . $escape($tr('dashboard_alerts_hint')) . '</span></div>' . $alertsHtml . '</div>'
+            . '<div class="card"><div class="dashboard-section-title"><h3>' . $escape($tr('overview_title')) . '</h3><span class="ui-muted">' . $escape($tr('dashboard_overview_subtitle')) . '</span></div><div class="hero-summary">' . $heroStatsHtml . '</div></div>'
+            . '</div>'
+            . '<div class="hero-side">'
+            . '<div class="card"><div class="dashboard-section-title"><h3>' . $escape($tr('quick_actions')) . '</h3><span class="ui-muted">' . $escape($tr('dashboard_quick_hint')) . '</span></div><div class="quick-actions">' . $quickActionsHtml . '</div></div>'
+            . $registrationSummary
+            . '</div>'
+            . '</div>'
             . '<form class="bar" method="get" action="/admin/users" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 14px 0;"><input name="q" placeholder="' . $escape($tr('search_email')) . '" value="' . $escape($searchQuery) . '" /><button type="submit">' . $escape($tr('search')) . '</button></form>'
             . '<div class="stats">' . $statsHtml . '</div>'
             . '<div class="columns">' . $chartsHtml . '</div>'
@@ -1465,7 +1510,7 @@ class AdminUsersController extends Controller {
             . '<div class="tile-hint">' . $escape($tr('registration_block_banner_hint')) . '</div>'
             . '</div>'
             . '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-            . '<a href="#registration-block" class="tile-action">' . $escape($actionLabel) . '</a>'
+            . '<a href="/admin/users#registration-block" class="tile-action">' . $escape($actionLabel) . '</a>'
             . '</div>'
             . '</div>';
     }
