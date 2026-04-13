@@ -40,16 +40,17 @@ if ! grep -q "^user *= *root$" /etc/supervisor/conf.d/supervisord.conf; then
 fi
 
 wait_for_database() {
-  php -r '
-    $dsn = sprintf("mysql:host=%s;port=%s;dbname=%s", getenv("WAIT_DB_HOST"), getenv("WAIT_DB_PORT"), getenv("WAIT_DB_NAME"));
-    try {
-        new PDO($dsn, getenv("WAIT_DB_USER"), getenv("WAIT_DB_PASSWORD"), [PDO::ATTR_TIMEOUT => 3]);
-        exit(0);
-    } catch (Throwable $e) {
-        fwrite(STDERR, $e->getMessage() . PHP_EOL);
-        exit(1);
-    }
-  '
+  MYSQL_PWD="${WAIT_DB_PASSWORD}" mariadb \
+    --protocol=TCP \
+    --host="${WAIT_DB_HOST}" \
+    --port="${WAIT_DB_PORT}" \
+    --user="${WAIT_DB_USER}" \
+    --database="${WAIT_DB_NAME}" \
+    --connect-timeout=3 \
+    --silent \
+    --skip-column-names \
+    --execute='SELECT 1' \
+    >/dev/null
 }
 
 if [ "${MAILER_HOST}" != "" ]; then
