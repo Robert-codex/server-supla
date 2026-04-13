@@ -20,6 +20,7 @@ namespace SuplaBundle\Twig;
 use Psr\Container\ContainerInterface;
 use SuplaBundle\Enums\InstanceSettings;
 use SuplaBundle\Repository\SettingsStringRepository;
+use SuplaBundle\Security\RegistrationBlockStore;
 use SuplaBundle\Supla\SuplaAutodiscover;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -43,7 +44,8 @@ class FrontendConfig {
     public function __construct(
         ContainerInterface $container,
         private SuplaAutodiscover $autodiscover,
-        private SettingsStringRepository $settingsRepository
+        private SettingsStringRepository $settingsRepository,
+        private RegistrationBlockStore $registrationBlockStore
     ) {
         $this->container = $container;
     }
@@ -53,6 +55,7 @@ class FrontendConfig {
         return array_merge(
             $parameters,
             [
+                'accountsRegistrationEnabled' => (bool)$this->container->getParameter('supla.accounts_registration_enabled') && !$this->registrationBlockStore->isBlocked(),
                 'isCloudRegistered' => $this->autodiscover->isTarget(),
                 'notificationsEnabled' => $this->isNotificationsEnabled(),
                 'max_upload_size' => [

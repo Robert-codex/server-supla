@@ -10,6 +10,8 @@ var/cloud-logs/
 var/admin_panel.json
 var/admin_panel_audit.log
 var/admin_panel_attempts.json
+var/admin_backup_schedule.json
+var/admin_registration_block.json
 var/mosquitto/data/
 var/mosquitto/log/
 var/mysql/
