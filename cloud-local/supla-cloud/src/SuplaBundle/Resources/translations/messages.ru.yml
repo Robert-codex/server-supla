@@ -1,0 +1,1909 @@
+# Do not add new translation keys manually. Run npm run collect-translations in order to update this file.
+#<editor-fold desc="Complete translations" defaultstate="collapsed">
+'%s trigger is not supported by the hardware.': Триггер %s не поддерживается устройством.
+...open and shut roller shutters: ...открывать и закрывать роллеты
+...open gateways, gates or doors: ...открыть ворота, калитки или двери
+...or control home appliances: ...или управлять бытовой техникой
+...you can monitor temperature: ...узнать температуру
+10 minutes before sunset, on day 10 of the month, May through August: За 10 минут до заката солнца, только 10. числа месяца, с мая по август
+15 minutes after sunrise, every 2 days: Через 15 минут после восхода солнца, через день
+A confirmation upon successful client app registration.: Подтверждение регистрации нового клиентского приложения.
+A confirmation upon successful device registration.: Подтверждение успешной регистрации устройства.
+A new client app (smartphone) been added to your SUPLA-Cloud account.: Новое клиентское приложение (смартфон) добавлено в вашу учетную запись SUPLA-Cloud.
+A new device has been added to your SUPLA-Cloud account.: Новое устройство добавлено в вашу учетную запись SUPLA-Cloud.
+A new personal access token has been generated.: Создан новый персональный токен доступа
+A-Z: А-Я
+ACTIVE: АКТИВНА
+AM2301 Temperature & Humidity Sensor: Датчик температуры и влажности AM2301
+AM2302 Temperature & Humidity Sensor: Датчик температуры и влажности AM2302
+API documentation: API документация
+API rate limits: Лимит запросов к API
+Aberration info: Подробности аберрации
+Aberrations count: Количество аберраций
+Above threshold: Выше порога
+Access ID: ID доступа
+Access ID is not active right now.: Идентификатор доступа сейчас не активен.
+Access Identifier: Ключи доступа
+Access Identifiers: Ключ Доступа
+Access identifier limit has been exceeded: Достигнут лимит Ключей Доступа
+Access to all of your devices through MQTT Broker: Доступ ко всем вашим устройствам через брокера MQTT
+Account: Учетка
+Account access when you are unavailable: Доступ к учетной записи, когда вы недоступны
+Account has been activated. You can Sign In now.: Аккаунт создан. Можете войти
+Action execution: Выполнение действий
+Action trigger: Триггер действия
+'Action trigger no. #{index}': 'Триггер # {index}'
+Action triggers: Триггеры действий
+Actions: Действия
+Active: Активные
+Active period: Период активности
+Add: Добавь
+Add a delay: Добавить задержку
+Add a new icon: Добавить новый значок
+Add action: Добавить действие
+Add first channel to set channel group function and save it: Выбрать первый канал для определения функции группы и ее сохранения
+Add new channel group: Добавить новую группу каналов
+Add new channel to this group: Добавить новый канал в группу
+Adjust parameters: Задать параметры
+After deletion of this icon all channels and channel groups that use this icon, will receive default icons.: Все каналы и группы каналов, которые используют этот значок, после его удаления получат значки по умолчанию.
+After granting the access, you can always remove it by adjusting the settings in your account settings section.: После предоставления доступа вы всегда можете изменить свое мнение, получив доступ в настройках учетной записи.
+After the device enters the configuration mode, it will not be accessible on your account.: Устройство не будет доступно из вашей учетной записи после входа в режим конфигурации.
+After the update, the application will be faster, more comfortable, more powerful... Just better!: После обновления приложение будет быстрее, удобнее... Просто лучше!
+After this operation, the counter will start counting from 0 regardless of its current state. This action cannot be reverted.: Счетчик начнет подсчет с 0 после этой операции, независимо от его текущего состояния. Эту операцию нельзя отменить.
+After you choose a subject, a direct link will be generated. You will be able to set all other options after its creation.: Ссылка будет создана сразу после выбора субъекта. Все остальные опции можно запускать сразу после ее создания.
+All: Все
+All the above and many more can be done from your phone or tablet: Все это и даже больше управляется со сартфона или планшета
+Allowed actions: Допустимые действия
+Allows to perform an action only using the HTTP PATCH request.: Позволяет выполнять действия только с помощью запроса HTTP PATCH.
+Alternatively, you can add a GET parameter to specify response format.: Вы также можете добавить параметр GET, чтобы указать формат ответа.
+And more: И прочее
+Any application or device that uses the {tokenName} token will not work anymore.: Все программы или устройства, которые используют токен {tokenName}, перестанут работать.
+'App version: %clientAppSoftwareVersion%': 'Версия приложения: %clientAppSoftwareVersion%'
+Application name cannot be blank.: Название приложения не может быть пустым
+Application requirements: Требования приложения
+Applications: Приложения
+Are you lost?: Вы потерялись? Что-то ищете?
+Are you sure you want to change channel’s function?: Вы действительно хотите изменить функцию канала?
+Are you sure you want to delete the entire measurement history saved for this channel?: Вы уверены, что хотите удалить всю историю измерений, созданную для этого канала ?
+Are you sure you want to delete this OAuth application?: Вы уверены, что хотите удалить это приложение OAuth ?
+Are you sure you want to delete this channel group?: Вы действительно хотите удалить эту группу?
+Are you sure you want to delete this client?: Вы уверены, что хотите удалить это клиентское приложение?
+Are you sure you want to delete this direct link?: Вы уверены, что хотите удалить эту прямую ссылку?
+Are you sure you want to delete this icon?: Вы уверены, что хотите удалить этот значок?
+Are you sure you want to delete this scene?: Вы уверены, что хотите удалить эту сцену?
+Are you sure you want to delete this schedule?: Ты уверен, что хочешь удалить этот график?
+Are you sure you want to reset the counter state?: Вы уверены, что хотите сбросить счетчик?
+Are you sure you want to revoke permissions granted to this OAuth application?: Вы уверены, что хотите отменить разрешения для этого приложения OAuth?
+Are you sure you want to revoke this token?: CВы уверены, что хотите отозвать токен?
+Are you sure?: Вы уверены?
+As in device: Как в устройстве
+Assign Access Identifiers: Приписать Ключи Доступа
+Assign Client apps: Назначить клиентские приложения
+Assign Locations: Подключенные Области
+Associated measured channel: Связанный канал управления
+Associated measurement channel: Связанный канал измерения
+At 05:45 PM, on the last day of the month: 'в 5: 45 в последний день месяца'
+At 11:30 AM, on the third Wednesday of the month: в 11:30, в третью среду месяца
+At every 5th minute on day-of-month 30 in May: каждые 5 минут, 30. числа месяца, только в мае
+At specified time: Для указанного времени
+At sunrise: на восходе солнца
+At sunrise, Monday through Friday: на восходе солнца, с понедельника по пятницу
+At sunset: на закате
+Authorization callback URLs (one per line): URL-адреса возврата авторизации (по одному в строке)
+Authorize the application, so that it can access your account.: Авторизуйте приложение, чтобы оно могло получить доступ к вашей учетной записи.
+Authorized: Авторизовано
+Automatic calibration: Автоматическая калибровка
+Automatic closing rule: Автоматическое закрытие ворот
+Automation: Автоматика
+Average voltage: Среднее напряжение
+Back to apps list: Вернуться к списку приложений
+Bar: Столбчатый
+Based on sunrise or sunset: На основе восход / закат
+Be notified when your channels change state: Уведомление об изменениях состояния каналов
+Be right back!: Вернитесь через несколько минут!
+Below threshold: Ниже порога
+Bottom position: Нижнее положение
+Bridge: Мост
+Brightness: Яркость
+CLICK TO DISABLE: ОТКЛЮЧИТЬ
+CLICK TO ENABLE: ИСПОЛЬЗОВАТЬ
+Calibrate: Калибровка
+Calibration: калибровка
+Calibration error: Ошибка калибровки
+Cancel: Отмена
+Cancel changes: Отменить изменения
+Cancelled: Аннулировано
+Cannot calculate when to run the schedule - incorrect configuration?: Не удалось вычислить дату запуска графика - неправильная конфигурация?
+Cannot change the channel function right now.: Вы не можете изменить функцию этого канала в данный момент.
+Cannot delete this I/O Device right now.: Вы не можете удалить это устройство в данный момент.
+Captcha token is not valid.: Неправильная капча.
+Caption: Подпись
+Caption is too long.: Название слишком длинное.
+Change: Изменить
+Change Password: Смена пароля
+Change channel function: Изменить функцию канала
+Change function: Изменить функцию
+Change icon: Сменить значок
+Changing channel’s function will also result in the following changes.: Изменение функции канала повлечет также следующие изменения.
+Channel: Канал
+Channel No: Номер канала
+Channel group: Группа каналов
+Channel group limit has been exceeded: Лимит групп каналов превышен
+Channel group must consist of at least one channel.: Группа каналов должна содержать, по крайней мере, один канал.
+Channel group reference will be removed from the items below.: Указание на группу каналов будет удалено из следующих элементов.
+Channel groups: Группы каналов
+Channel is assigned to the I/O device location: Канал назначен по местоположению устройства
+Channel name: Название канала
+Channel reference will be removed from the items below.: Канал будет удален из следующих элементов.
+Channel with action triggers: Канал с триггерами действий
+Channels: Каналы
+Channels groups are not supported for this function.: Эта функция не поддерживает группы каналов.
+Chart type: Тип диаграммы
+Check the direct link you used and try again.: Проверь ссылку и повтори попытку.
+Check your email box: Проверьте почтовый ящик
+Check your email inbox: Проверьте свой почтовый ящик
+Choose: выберите
+Choose Access Identifier: Выберите Идентификатор Доступа
+Choose Access Identifiers to be assigned to this Location: Выберите Ключи Доступа для этой Позиции
+Choose channel function: Выберите функцию канала
+Choose client apps: Выберите клиентские приложения
+Choose location: Выбрать местоположение
+Choose the source channel.: Выберите исходный канал.
+Clear: Очистить
+Click the following link to confirm removal of your account on %cloudHost%.: Чтобы подтвердить удаление Вашей учетной записи SUPLA, нажмите на ссылку ниже.
+Click the following link to confirm unregistration of your private SUPLA Cloud instance (%targetCloudUrl%).: Нажмите на ссылку ниже, чтобы подтвердить отмену регистрации вашего персонального экземпляра SUPLA Cloud (%targetCloudUrl%).
+'Client app ID: %clientAppId%': 'Идентификатор: %clientAppId%'
+Client registration: Регистрация клиентов
+Client’s Apps: Клиентские приложения
+Client’s app has been deleted: Клиентское приложение было удалено
+Close: Закрыть
+Close after: Закрыть после
+Close automatically: Закрыть автоматически
+Close partially: Закрыть частично
+Color: Цвет
+Color brightness: Яркость цвета
+Comment: Коментарий
+Config of the schedule is too complicated.: Конфигурация графика слишком сложная.
+Configuration: Конфигурация
+Confirm My Account: Подтверждаю свою учетную запись
+Confirm Password: Подтвердить пароль
+Confirm if you want to remove Access Identifier: Подтвердите удаление Ключа Доступа
+Confirm if you want to remove the Location ID{locationId}. You will no longer be able to connect the i/o devices to this Location.: Подтвердить удаление Местоположения ID{locationId}. Дальнейшее подключение устройств ввода-вывода к этому местоположению будет невозможно.
+Confirm if you want to remove {deviceName} device and all of its channels.: Подтвердите, что ввы хотите удалить устройство {deviceName} и все его каналы.
+Connected: Подключено
+Connection with a private instance of the SUPLA cloud: Подключение к персональной инстанции облака SUPLA.
+Constraints: Ограничения
+Copy state from other channel: Скопируйте состояние из другого канала
+Could not contact Autodiscover service. Try again in a while.: Невозможно связаться с регистрационной службой. Повторите попытку позже.
+Could not enter the configuration mode.: Не удалось перевести устройство в режим конфигурации.
+Could not reset the password.: Не удалось сбросить пароль.
+Could not reset the password. Please try again later.: Не удается сбросить пароль. Повторите попытку позже.
+Create New Access Identifier: Создать новый ключ доступа
+Create New Location: Создать новую Область
+Create New Schedule: Создай новый график
+Create an account: Создать учетку
+Create new direct link: Создать новую прямую ссылку
+Create new scene: Создать новую сцену
+Currency: Валюта
+Current Overload: Перегрузка
+Current Password: Текущий пароль
+Current password is incorrect: Введенный пароль неправилен
+Custom: Нестандартный
+Custom execution limit: Нестандартный лимит исполнений
+DHT11 Temperature & Humidity Sensor: Датчик температуры и влажности DHT11
+DHT21 Temperature & Humidity Sensor: Датчик температуры и влажности DHT21
+DHT22 Temperature & Humidity Sensor: Датчик температуры и влажности DHT22
+DS18B20 Thermometer: Термометр DS18B20
+Data saved: Данные сохранены
+Date: Дата
+Decline: Отказать
+Default: по умолчанию
+Delete: Удалить
+Delete measurement history: Удалить историю измерений
+Delete my account: Удалить мою учетную запись
+Delete voltage aberrations history: Удалить историю аббераций напряжения
+Depth: Глубина
+Depth sensor: датчик глубины
+Description: Описание
+Details: Подробная информация
+Device: Устройство
+'Device ID: %deviceId%': 'Идентификатор устройства: %deviceId%'
+Device is disconnected.: Устройство отключено.
+Device might be sleeping: Устройство может находиться в спящем режиме
+'Device name: %deviceName%': 'Имя устройства: %deviceName%'
+Device should be now in configuration mode.: Теперь устройство должно быть в режиме конфигурации.
+'Device software version: %deviceSoftwareVersion%': 'Версия программного обеспечения: %deviceSoftwareVersion%'
+Device unavailable: Оборудование недоступно
+Digi Glass: Digi Glass
+Digi Glass Horizontal: Digi Glass горизонтальный
+Digi Glass Vertical: Digi Glass вертикальный
+Dimmer: Диммер
+Dimmer & RGB led controller: Диммер и контроллер освещения RGB
+Dimmer and RGB lighting: Диммер и освещение RGB
+Direct link: Прямая ссылка
+Direct link has been created successfully!: Прямая ссылка успешно создана!
+Direct link has been executed: Ссылка создана
+'Direct link is not working right now. Reason:': 'Прямая ссылка в данный момент не работает. Причина:'
+Direct links: Прямые ссылки
+Direct links limit has been exceeded: Лимит прямых ссылок превышен
+Disable: Выключить
+Disable local function: Отключить функцию устройства
+Disabled: Неиспользуется
+Disables local device function and does nothing more.: Не выполняет никаких действий, но отключает функцию устройства, которая по умолчанию для этого действия.
+Disconnected: Отключено
+Distance: Расстояние
+Distance sensor: датчик расстояния
+Do you want to be redirected there? You may be asked to authenticate again.: Вы хотите, чтобы мы перенаправили вас туда? Возможно, вам придется снова войти в систему.
+Don’t worry, you can always reset your password via email. Click here to do so.: Не беспокойтесь, Вы сможете восстановить пароль по почте. Для этого нажмите здесь.
+Door lock operation: Открытие двери
+Door opening sensor: Датчик открытия двери
+Doors and gates: Двери и калитки
+Doors, Gates, Windows: Двери, ворота, окна
+Download the history of measurement: Скачать историю измерений
+Drag your image(s) here or click to select from the disk: Перетащите изображение сюда или нажмите, чтобы выбрать с диска
+Edit: Изменить
+Electric: Электрика
+Electricity meter: Счетчик электроэнергии
+Empty!: Пусто!
+Enable: Включить
+Enabled: Используется
+End date: Дата окончания
+Enter new password: Введите новый пароль
+Enter strong password: Введите сложный пароль
+Enter the data below in the settings of your control device (I/O Device).: Введите данные ниже в настройки вашего устройства управления (устройство входа/выхода).
+Enter the data below in your mobile SUPLA application on your smartphone.: Введите данные ниже в мобильное приложение SUPLA, установленное на вашем смартфоне.
+Enter the domain with the port only if it is not standard (443). We require HTTPS connection.: Введите только домен вместе с портом, если он не является стандартным (443). Требуется соединение HTTPS.
+Enter your email address: Введите адрес почты
+Enter your password to prevent automatic logout.: Введите свой пароль, чтобы предотвратить автоматический выход из системы.
+Error: Ошибка
+Error when communicating the AD. Try again in a while.: Ошибка при коммуникации с AD. Повторите попытку позже.
+Error when communicating the server. Try again in a while.: Произошла ошибка во время связи с сервером. Повторите попытку позже.
+Estimated execution time: Примерное время выполнения
+Every: каждые
+Example Auth URL: Примерный URL авторизации
+Execute: Выполнить
+Execute an action: Выполнить действие
+Executed action: Выполненное действие
+Executed without confirmation: Выполнено без подтверждения
+Execution history: История исполнений
+Execution limit: Лимит исполнений
+Executions: Реализации
+Expired: Просрочен
+Failed: Не получилось
+Failed (zombie): Не получилось (зомби)
+Feature limits: Лимиты функциональности
+Flooding: Затопление
+For a short period of time, it is recommended for you to use the {suplaUrl} address.: Во время обновления рекомендуется использовать адрес {suplaUrl}.
+For devices: Для устройств
+For security reasons, the full URL of this direct link will be displayed only once, during creation.: По соображениям безопасности, полный URL этой прямой ссылки будет отображаться только один раз при ее создании.
+Forgot your password?: Не помнишь пароль?
+Forward active energy: Продвижение активной энергии
+Forward active energy balanced: Активная энергия взята (векторный баланс)
+Forward reactive energy: Пассивная энергия взята
+Fridays: Пятницы
+From anywhere: Отовсюду
+Full closing time: Общее время закрытия
+Full documentation: Полная документация
+Full opening time: Общее время открытия
+Fully opened sensor for channel: Канал датчика
+Function: Назначение
+G5LA1A Relay: Реле G5LA1A
+G5LA1A Relay x2: Двойное реле G5LA1A
+GENERATE: СОЗДАТЬ
+Garage door opening sensor: Датчик открытия гаража
+Garage door operation: Открытие/закрытие гаражных ворот
+Gas meter: Счетчик газа
+Gate opening sensor: Датчик открытия ворот
+Gate operation: Открытие/закрытие ворот
+Gate's state verification: Проверка статуса ворот
+Gateway lock operation: Открытие калитки
+Gateway opening sensor: Датчик открытия калитки
+General purpose measurement: Общий канал измерения
+Generate new password: Создать новый пароль
+Generate new token: Создать новый токен
+Generate token: Создать токен
+Go to I/O device details: Перейти к подробной информации устройства
+Go to channel details: Перейти к подробной информации канала
+Go to your account: Перейди в свой аккаунт
+Grant access: Предоставить доступ
+Guru Meditation: Guru Meditation
+HFD4 Relay: Реле HFD4
+Heat meter: Теплосчетчик
+Hide days without aberrations: Скрыть дни без аберрации
+History of measurements: История измерений
+Home appliances: Бытовая техника
+Home+ Heater: Дом + обогреватель
+Host: Хост
+However, currently there is too heavy load on our servers. We are monitoring the situation. Come back in a while.: К сожалению, в настоящее время использование наших серверов возросло до опасного уровня. Мы следим за ситуацией, ждем вас обратно через несколько минут.
+Humidity: Влажность
+Humidity Sensor: Датчик влажности
+Humidity adjustment: Регулировка влажности
+Humidity sensor: Датчик влажности
+I accept the Terms and Conditions and hereby agree for processing of my personal data for the purposes included in the said Terms and Conditions.: Я принимаю правила и даю согласие на обработку моих персональных данных в целях и объеме, указанном в Правилах.
+I agree: Я согласен
+I agree, take me to the app: Я согласен, перейти к приложению
+I confirm! Delete my account.: Подтверждаю! Удалить мою учетную запись.
+I do not agree, get me out of here: Я не согласен, уберите меня отсюда
+I/O Devices: Устройства
+I/O devices registration: Регистрация устройств
+ID: ID
+INACTIVE: НЕАКТИВНА
+Icon: Значок
+Idle: Бездействующие
+If the device is currently in the sleep mode, the configuration changes you made will be applied after it is woken up.: Если устройство в данный момент находится в спящем режиме, изменения конфигурации вступят в силу после его пробуждения.
+If the device is not awaken now, it will enter the configuration mode at the next wake up.: Если устройство сейчас находится в спящем режиме, оно войдет в режим конфигурации при ближайшем пробуждении.
+If the link is not working, please copy and paste it or enter manually in a new browser window.: Если автоматический переход не работает, скопируйте текст ссылки в окно браузера вручную.
+If you are a developer who wants to provide additional features for SUPLA, create an OAuth application that users can authorize and use.: Если вы программист и хотите предоставить дополнительные возможности для SUPLI, создайте приложение OAuth, которое пользователи смогут авторизовать и использовать.
+If you are sure you have an account on cloud.supla.org, check if the application you are trying to authorize is public.: Если вы уверены, что у вас есть учетная запись на cloud.supla.org, убедитесь, что приложение, которое вы пытаетесь авторизовать, является публичным.
+If you did not request this password reset, please ignore this information.: Если Вы не запрашивали сброс пароля, просто проигнорируйте это сообщение.
+If you do not want to delete your account on %cloudHost%, please do not click the link.: Если вы не хотите удалять учетную запись на сайте %cloudHost%, не нажимайте на ссылку.
+If you do not want to unregister your instance, please do not click the link.: Если вы не хотите отменить регистрацию вашего экземпляра, не нажимайте на ссылку.
+If you fail to connect this AP for several minutes, it will restart itself and use the last settings.: Если вы не сможете подключиться к этой точке доступа в течение нескольких минут, устройство перезагрузится и подключится, используя последние настройки.
+If you have doubts or more questions, you can contact us directly at %securityEmail%.: Если у вас есть сомнения или вопросы, вы можете связаться с нами по адресу %securityEmail%.
+If you have lost your instance token and you are going to re-register your instance, it's the right thing to do.: Если вы хотите снова зарегистрировать свой экземпляр SUPLA Cloud, потому что токен, сгенерированный при предыдущей регистрации, пропал, - вы в нужном месте.
+If you have not used this email address with %cloudHost%, please do not click the link.: Если Вы не вводили этот адрес почты на %cloudHost%, просто проигнорируйте это письмо.
+If you really want to delete the account, here are the instructions.: Если вы по-прежнему хотите удалить учетную запись SUPLA, здесь вы найдете инструкции.
+If you really want to unregister your private SUPLA Cloud instance, here are the instructions.: Если вы действительно хотите отменить регистрацию вашего персонального экземпляра SUPLA Cloud, - ниже найдете все инструкции.
+If you register yourself again in the future, some devices might need reconfiguration even if you use the same e-mail address.: После повторной регистрации учетной записи некоторые устройства могут потребовать повторной настройки, даже если указать тот же адрес электронной почты.
+If you want to integrate your Cloud with public OAuth applications, you must {registerYourSuplaCloudLink}.: Если вы хотите интегрировать персональное облако SUPLA с публичным приложением OAuth, вам необходимо {registerYourSuplaCloudLink}.
+If you want to use the link programmatically, add an appropriate request header to obtain an output you can easily parse.: Для использования ссылки в другом программном обеспечении, добавь соответствующий заголовок запроса, чтобы получить ответ, который будет легче обрабатывать.
+If you wish not to receive such messages, change it in your account settings [here].: Если вы не хотите получать от нас такие уведомления,<br> ознакомьтесь с настройками своей учетной записи [здесь].
+If you wish to see the available integrations, go to {0}.: Если вы хотите увидеть доступные интеграции, перейдите на {0}.
+Impulse counter: Счетчик импульсов
+Impulses: Импульсы
+In order to confirm account deletion, enter your password.: Для подтверждения удаления вашей учетной записи введите свой пароль.
+In order to get the MQTT Broker credentials, concact the administator of this SUPLA Cloud instance.: Чтобы получить данные для входа в брокер MQTT, обратитесь к администратору этого экземпляра SUPLA Cloud.
+Inactive: Неактивен
+Include energy corrections in new measurements history (not recommended): Включить добавленное значение в историю (не рекомендуется)
+Incorrect password: Неверный пароль
+Inherit I/O Device location: Использовать местоположение устройства
+Integration with MQTT Broker has been disabled.: Интеграция с брокером MQTT была отключена.
+Integration with MQTT Broker has been enabled.: Интеграция с брокером MQTT была включена.
+Integrations: Интеграции
+Interrupt: Прервать
+Interrupt and execute: Прервать и выполнить
+Interval: Интервал
+Invalid SUPLA Cloud URL.: Неверный URL-адрес экземпляра SUPLA Cloud.
+Invalid action parameters: Неверные параметры иссполнения.
+Invalid function for channel.: Неверная функция для канала
+'Invalid redirect URI: {uri}': 'Invalid redirect URI: {uri}'
+Invalid request: Неверный запрос
+Invalid request.: Неверный запрос.
+Invalid token.: Неверный токен.
+Inverted logic: Реверсивная логика
+Invisible: Невидимые
+It is possible that another user have entered your email address by mistake while resetting password to their own account.: Возможно другой пользователь ошибочно ввел данный адрес почты при сбросе своего пароля.
+Keep in mind that we will delete all your settings, configured devices, locations, schedules and all other features that you used in SUPLA along with your account.: Помните, что вместе с Вашей учетной записью будут удалены все Ваши данные, включая настройки, настроенные устройства, местоположения, расписания и все прочие функции, предлагаемые SUPLA.
+Language is not available: Язык недоступен
+Last access: Последний звонок
+Last connection: Последнее соединение
+Last used: Поледним использовался
+Let me choose later: Позвольте мне выбрать позже
+Light switch: Выключатель света
+Lighting: Освещение
+Limit has been exceeded: Лимит был превышен
+Linear: Линейный
+Liquid, Temp: Жидкость, Темп
+Location: Область
+Location Identifier: ID Позиции
+Location limit has been exceeded: Достигнуто ограничение числа Областей
+Location name: Название местоположения
+Locations: Область
+Login: Вход в систему
+Longest aberration: Самая длинная аберрация
+Lower voltage threshold: Порог низкого напряжения
+MQTT Broker: Брокер MQTT
+MQTT Broker Username: Имя пользователя
+MQTT Broker is disabled.: Брокер MQTT отключен.
+MQTT Broker password: Пароль брокера MQTT
+MQTT Broker password has been changed.: Пароль брокера MQTT изменен.
+MQTT Broker username and password is not configured in this SUPLA Cloud instance.: Имя пользователя или пароль не настроены в этом экземпляре.
+Mail sensor: Сигнализатор наличия почты
+Maintenance mode active. You cannot modify any data now.: Работа в сервисном режиме. Вы не можете изменять какие-либо данные.
+Make sure to copy it now because you won’t be able to see it again!: Убедитесь, что вы храните их в безопасном месте.
+Make sure to save it in a secure place if you wish to access it in the future. The link won’t be again displayed after you leave this page.: Убедитесь, что он сохранен в надежном месте, если вы хотите использовать его снова в будущем. Ссылка не будет отображаться, когда вы покинете эту страницу.
+Manage your new client app in the SUPLA-Cloud.: Управление настройками приложения в SUPLA-Cloud.
+Manage your new device in the SUPLA-Cloud or with your smartphone SUPLA app.: Управляйте своим устройством в SUPLA-Cloud или с помощью приложения SUPLA на вашем смартфоне.
+Manual: Инструкция
+Manually closed: Закрыт вручную
+Maximum delay is 60 minutes.: Максимальная задержка - 60 минут.
+Maximum filesize limit is {limit}.: Максимальный размер файла - {limit}.
+Maximum voltage: Максимальное напряжение
+Measurement window: Время измерения
+Meter value: Состояние счетчика
+Meters: Счетчики
+Minimum voltage: Минимальное напряжение
+Mode: Режим
+Modification: Модификация
+Mondays: Понедельники
+Move down or stop: Вниз или остановить
+Move up or stop: Вверх или остановить
+My OAuth apps: Мои приложения OAuth
+My SUPLA: Моя SUPLA
+NOTICE!: ВНИМАНИЕ!
+Name: Название
+'Name: %clientAppName%': 'Имя: %clientAppName%'
+Need one of these?: Это может вам пригодиться
+Never: Никогда
+New IO device added to your account: Добавление нового устройства
+New OAuth application: Новое приложение OAuth
+New channel group: Новая группа каналов
+New client app (smartphone) added to your account: Регистрация нового клиентского приложения (смартфона)
+New direct link: Новая прямая ссылка
+New password: Новый пароль
+New scene: Новая сцена
+Newer: Новые
+'Next limit renewal: {date}': Лимит будет обновлен {date}
+Next run date: Ближайшее исполнение
+No access identifier enabled. Go to {accessIdsListLink} or {newAccessIdLink}.: У вас нет активных идентификаторов доступа. Перейти к {accessIdsListLink} или {newAccessIdLink}.
+No function: Не назначено
+No future executions - schedule disabled: Нет запланированных исполнений – график выключен
+No limit: Без лимита
+No liquid sensor: Датчик наличия жидкости
+No location enabled. Go to {locationsListLink} or {newLocationLink}.: У вас нет активных местоположений. Перейти к {locationsListLink} или {newLocationLink}.
+No of channels: Количество каналов
+No of client apps: Количество клиентских приложений
+No of devices: Количество устройств
+No of operations: Количество операций
+No schedule configuration.: Конфигурация графика не указана.
+None: Нет
+None (channel disabled): Пусто (канал выключен)
+No{'.'} of Client’s apps: Количество клиентских приложений
+No{'.'} of access identifiers: Количество идентификаторов доступа
+No{'.'} of channel groups: Количество групп каналов
+No{'.'} of channels: Количество каналов
+No{'.'} of devices: Количество устройств
+No{'.'} of locations: Количество местоположений
+Number of aberrations: Количество аберраций
+Number of attempts to close: Количество попыток закрытия
+Number of attempts to open: Количество попыток открытия
+Number of sections: Количество разделов
+OAuth apps: Приложения OAuth
+OAuth authorization: Авторизация OAuth
+OAuth integrations might stop working after the instance is unregistered.: Интеграция с приложениями OAuth может перестать работать после отмены регистрации вашего экземпляра.
+'Off': Выключить
+Offline access: Доступ офлайн
+Older: Старые
+'On': Включить
+On/Off switch: Выключатель
+Only domain names with an optional port number are allowed. E.g. mysupla.org or mysupla.org:88. HTTPS is required.: Разрешены только доменные имена с дополнительным номером порта. Например, mysupla.org или mysupla.org:88. HTTPS обязателен.
+Open: Открыть
+Open / close: Открыть / закрыть
+Open partially: Открыть частично
+Opening sensor: Датчик открытия
+Operations: Операции
+Original location: Исходное локализацию
+Other: Другое
+Otherwise go to the homepage.: В противном случае перейдите на [домашнюю страницу].
+Partial opening sensor: Датчик промежуточного открытия
+Partially opened sensor for channel: Канал для датчика промежуточного открытия
+Password: Пароль
+Password Reset: Сброс пароля
+Password has been changed: Пароль изменен
+Password must be at least {minLength} characters.: Пароль должен иметь не менее {minLength} символов.
+Password must be no longer than {maxLength} characters.: Пароль не может быть длиннее {maxLength} символов.
+Password reset instructions.: Инструкции по восстановлению доступа к вашей учетной записи.
+Percentage of closing: Процент закрытия
+Personal access tokens: Персональные токены доступа
+Personal access tokens function like ordinary OAuth access tokens but they have no expiration time.: Личные токены доступа работают так же, как и обычные, но являются бессрочными.
+Personal token name is required.: Необходимо указать имя персонального токена.
+Phase 1: Фаза 1
+Phase 2: Фаза 2
+Phase 3: Фаза 3
+Phase number: Фаза
+Please choose the schedule subject first.: Сначала выберите, чем график должен управлять
+Please click the following link to reset your %cloudHost% password.: Перейдите по следующей ссылке для сброса пароля на %cloudHost%.
+Please click the link we have sent you after the registration to proceed.: Нажмите на ссылку из сообщения, которое мы отправили Вам после создания учетной записи.
+Please confirm your SUPLA account.: Активируйте свою учетную запись в SUPLA.
+Please enter a valid email address: Введите правильный адрес электронной почты
+Please fill a valid email address: Впишите корретный почтовый адрес
+Please log in again to proceed.: Войдите снова, чтобы продолжить.
+Please provide a valid domain name for your private SUPLA Cloud: Введите правильное имя домена для вашего персонального облака SUPLA
+Please read the Terms and Conditions.: Читать правила.
+Please wait a moment before the next login attempt.: Подождите минуту перед следующей попыткой входа.
+Port: Порт
+Precision: Точность
+Pressure sensor: Датчик давления
+Price per: Цена за
+Private Cloud domain name: Доменное имя персонального облака
+Private instance of the SUPLA cloud with given URL is already registered.: По этому адресу уже зарегистрировано частное облако SUPLA.
+Proceed: Продолжить
+Processing: В реализации
+Protocol: Протокол
+Public ID: Публичный ID
+Publish to integrations: Опубликовать для интеграции
+Publishes the event to integrated services like MQTT or webhooks.: Уведомляет такие интеграции как MQTT или Webhooks о выполнении этого действия.
+RESET: СБРОС
+RGB led controller: Контроллер освещения RGB
+RGB lighting: Освещение RGB
+Rain sensor: Датчик дождя
+Random: Произвольный
+Read: Показание
+Reference to the scene will be removed from the items below.: Указание на сцену будет удалено из следующих элементов.
+Refresh: Обнови
+Regeneration starts at: Начало регенерации
+Register: Регистрация
+Register a new OAuth application: Зарегистрировать новое приложение OAuth
+Register private SUPLA Cloud: Зарегистрировать персональное облако SUPLA
+Register your SUPLA Cloud: Зарегистрируйте свой экземпляр SUPLA Cloud
+Registered: Зарегистрирован
+'Registered from IP address: %clientAppRegIp%': 'Зарегистрировано с IP-адреса: % clientAppRegIp%'
+'Registered from IP address: %deviceRegIp%': 'IP-адрес: % deviceRegIp%'
+Relay: Реле
+Relay switching time: Время переключения реле
+'Relocate all the associated channel groups before you delete this location. Ids: {relatedIds}.': 'Перед удалением местоположения необходимо переместить группы каналов, которые в нем находятся. Идентификаторы: {relatedIds}.'
+'Relocate all the associated channels before you delete this location. Ids: {relatedIds}.': 'Перед удалением местоположения необходимо переместить каналы, которые в нем находятся. Идентификаторы: {relatedIds}.'
+'Remove all the associated devices before you delete this location. Ids: {relatedIds}.': 'Удалите связанные устройства перед удалением этого местоположения. Идентификаторы: {relatedIds}.'
+'Remove all the associated scenes before you delete this location. Ids: {relatedIds}.': 'Удалите все связанные сцены перед удалением этого местоположения. Идентификаторы: {relatedIds}.'
+'Remove all the devices using this location as an official before you delete it. Ids: {relatedIds}.': 'Сначала удалите все устройства, использующие это местоположение как исходное. Идентификаторы: {relatedIds}.'
+Repeat password: Повторите пароль
+Reset Your Password: Установить новый пароль
+Reset counter: Сбросить счетчик
+Retry on failure: Повторить при невыполнении
+Reveal: Открыть
+Reveal partially: Открыть частично
+Reverse active energy: Активная энергия возвращена
+Reverse active energy balanced: Активная энергия возвращена (векторный баланс)
+Reverse reactive energy: Пассивная энергия возвращена
+Revoke: Аннулировать
+Roller shutter opening sensor: Датчик роллет
+Roller shutter operation: Управление роллетами
+Roller shutters: Роллеты
+Roof window opening sensor: Датчик открытия окна крыши
+Roof window shutter operation: Открытие окна крыши
+SUPLA - Account Activation: Активация аккаунта SUPLA
+SUPLA - Account Removal: SUPLA - Удаление учетной записи
+SUPLA - Password reset: Сброс пароля для SUPLA
+SUPLA - Private instance unregistration: SUPLA - отмена персонального экземпляра
+SUPLA Cloud is under maintenance.: Идет обновление SUPLA Cloud.
+SUPLA Server was unable to execute the action.: Ошибка при выполнении действия на SUPLA Server.
+SUPLA Server was unable to execute the scene.: Сервер SUPLA не смог выполнить сцену.
+SUPLA Server was unable to query for the scene state.: Сервер SUPLA не смог прочитать состояние сцены.
+SUPLA is available from anywhere at any time, so do not worry, if you forget to turn the lights off next time: SUPLA доступна везде и всегда, так что не бойтесь забыть выключить свет или утюг
+SUPLA – %cloudHost% unsuccessful login attempt notification: SUPLA – Уведомление о неудачной попытке входа в %cloudHost%
+SUPLA – new client app has been added to your account: SUPLA - зарегистрировано новое клиентское приложение
+SUPLA – new device has been added to your account: SUPLA - новое устройство добавлено в вашу учетную запись
+SUPLA.ORG Team: Команда SUPLA.ORG
+Saturdays: Субботы
+Save: Сохранить
+Save and enable: Сохранить и включить
+Save changes: Сохранить изменения
+Save or discard configuration changes first.: Сначала сохраните или отклоните изменения в конфигурации.
+Scene: Сцена
+Scene must consist of at least one operation.: Сцена должна содержать не менее одной операции
+Scenes: Сцены
+Scenes limit has been exceeded: Вы не можете создать больше сцен
+Schedule: График
+Schedule limit has been exceeded: Лимит графиков превышен
+Schedule mode: Режим графика
+Schedules: Графики
+Scope: Диапазон (scope)
+Scopes: Диапазоны
+Scopes define which sections of your account can be accessed when using the token.: Диапазоны определяют, к каким ресурсам учетной записи можно получить доступ с помощью токена.
+Search: Поиск
+Secret: Секретный ключ (secret)
+See available integrations: Просмотр доступных интеграций
+See direct link possibilities: Посмотри возможности ссылки
+See in SUPLA-Cloud: См. в SUPLA-Cloud
+Seems like a secret place: Что-то нам подсказывает, что вас здесь быть не должно
+Select icon: Выбрать значок
+What the link is for?: Выберите элемент (субъект), который хотите контролировать с помощью этой ссылки
+Sensor disconnected: Нет датчика
+Sensors: Датчики
+Server address: Адрес сервера
+Server unreachable: Соединить с сервером невозможно
+Service temporarily unavailable: Сервис временно недоступен
+Set value added: Задать добавленное значение
+Setting the number of attempts to 1 disables the retrying behavior completely.: Установка количества попыток ниже 2 может привести к невозможности закрытия или открытия.
+Show my limits: Показать мои лимиты
+Show on the Client’s devices: Показать на клиентских устройствах
+Shut: Закрыть
+Shut partially: Прикрыть частично
+Sign In: Войти
+Sign Out: Выйти
+Sign in temporarily unavailable. Please try again later.: Вход временно недоступен. Повторите попытку позже.
+Smartphones: Смартфоны
+SoftVer: Версия
+Some features depend on this channel group: Некоторые функции зависят от этой группы каналов.
+Some features depend on this device: Некоторые функции зависят от этого устройства
+Some features depend on this scene: Некоторые функциональные возможности зависят от этой сцены.
+Some of the features you have configured depend on channels from this device.: Некоторые функции используют каналы с этого устройства.
+Staircase timer: Лестничный автомат
+Start Here: Начни отсюда
+Start date: Дата начала
+Start from the homepage.: Начните с домашней страницы.
+State: Состояние
+State webhook: Webhook состояния
+Status: Статус
+Step by step: Шаг за шагом
+Stop: Остановить
+Store measurements history: Сохранять историю измерений
+Subject type: Тип субъекта
+Success: Успешно
+Successful: Выполнено успешно
+Sundays: Воскресенья
+Switch the device to configuration mode: Перевести устройство в режим конфигурации
+THIS CANNOT BE UNDONE!: ЭТУ ОПЕРАЦИЮ НЕВОЗМОЖНО ОТМЕНИТЬ!
+TLS: TLS
+Target Cloud is not registered, or is registered with another e-mail address.: Этот экземпляр SUPLA Cloud не зарегистрирован или зарегистрирован с использованием другого адреса электронной почты.
+Temperature: Температура
+Temperature & Humidity Sensor: Датчик температуры и влажности
+Temperature Sensor: Датчик температуры
+Temperature adjustment: Регулировка температуры
+Temperature and humidity sensor: Датчик температуры и влажности
+Thank you for registering an account with %cloudHost%. Please click the following link to complete activation of your account.: Благодарим Вас за регистрацию аккаунта на %cloudHost%. Для активвации учетнойтзаписи нажмите на следующую ссылку.
+'The IP used for login is: %ip%': 'Попытка входа в систему была осуществлена с IP-адреса: %ip%'
+The MQTT Broker password is visible now only. Make sure to save it in a safe place. You will not be able to see it again.: Пароль брокера MQTT виден только на данный момент. Убедитесь, что вы сохранили его в безопасном месте. Вы не сможете его повторно отобразить.
+The SUPLA infrastructure is being updated.: Продолжается обновление серверов SUPLA.
+The Terms and Conditions have changed: Правила изменились
+The Terms and Conditions have changed – please read them and accept.: Правила сайта изменились - требуется согласие.
+The activation link has been sent again. Check the inbox.: Сообщение со ссылкой для активации Вашей учетной записи было отправлено снова. Проверьте входящие сообщения.
+The client will be automatically logged out when deleted.: Удаление клиента приведет к его немедленному выходу из системы.
+The counter has been reset.: Счетчик был сброшен.
+The device is disabled: Оборудование выключено
+The device might be in a sleep mode.: Устройство может работать в спящем режиме.
+The following items use the channels of these device. These references will be also removed.: Следующие элементы используют каналы с этого устройства. Они также будут удалены.
+'The following items will be deleted with this device:': Следующие элементы также будут удалены вместе с этим устройством.
+The gate sensor must function properly in order to execute the Open and Close actions.: Датчик открытия ворот должен работать правильно, чтобы выполнить действие Открыть или Закрыть.
+The gate sensor must function properly in order to execute the scheduled action.: Чтобы выполнить задачу, датчик открытия ворот должен работать правильно.
+The incident was detected at %datetime%.: Событие произошло %datetime%.
+The items below depend on this channel function, so they will be deleted.: Следующие элементы основаны на текущей функции канала, поэтому будут удалены при ее изменении.
+The items below depend on this channel group, so they will be deleted.: Следующие элементы используют эту группу каналов, поэтому после ее удаления они также будут удалены.
+The items below depend on this scene, so they will be deleted.: Следующие элементы опираются на эту сцену, поэтому будут удалены.
+The latest execution: Последнее исполнение
+The link result is presented as a website response, because you (or your browser) asked for HTML output.: Результат отображается в виде веб-сайта, потому что Вы (или Ваш браузер) запросили ответ в формате HTML.
+The measurement history has been deleted.: История измерений удалена.
+The new password will replace the existing one. Some of the current integrations may not work anymore. Proceed?: Новый пароль заменит тот, который вы используете в настоящее время. Некоторые интеграции могут перестать работать после его изменения. Продолжить?
+The next available executions: Ближайшие исполнения
+The password and its confirm are not the same.: Пароль и его подтверждение не совпадают.
+The password should be 8 or more characters.: Пароль должен быть 8 или более символов.
+The scene would execute too many operations.: Сцена выполняет слишком много операций.
+The server has returned an HTTP 400 Error. It means that the request you tried to perform is invalid.: Сервер вернул ошибку 400, означающую, что высланный запрос неверен.
+The server has returned an HTTP 403 Error. It means that you are not authorized to display the item you are looking for.: Сервер вернул ошибку HTTP 403. Это означает, что у вас нет достаточных прав для просмотра данного ресурса.
+The server has returned an HTTP 404 Error. It means that the item you are looking for does not exist.: Сервер вернул ошибку HTTP 404. Это означает, что ресурс, который вы ищете, не существует.
+The server has returned an HTTP {statusCode} error.: Сервер вернул ошибку {statusCode}.
+The set of icons you have chosen is too large. Maximum upload limit is {limit}.: Выбранный Вами файлы икон превышают максимальный размер. Максимальный размер загружаемого файла - {limit}.
+The valve cannot be opened via a direct link or via API once it has been closed manually. To resume control, open the valve manually.: Клапан не может быть открыт по прямой ссылке или через API, если он был закрыт вручную. Чтобы возобновить управление, откройте клапан вручную.
+The valve will not be opened if it was closed manually or remotely, which might could been caused by flooding.: Клапан не откроется, если он был закрыт вручную или дистанционно, что могло быть связано с затоплением.
+There are no more channels you can add to this group: Нет других каналов, которые можно добавить в эту группу
+Thermometer: Термометр
+Thermostat: Термостат
+directLinkExecutionFailureReason_invalidActionParameters_info: Эта прямая ссылка требует уточнения параметров выполняемого действия. Смотрите приведенные ниже примеры, чтобы узнать, какие параметры вы можете задать.
+This information has been generated automatically due to an unsuccessful login attempt to SUPLA-CLOUD (%cloudHost%) with the use of your email address.: Вы получили эту информацию в связи с неудачной попыткой входа в SUPLA-CLOUD с использованием вашего адреса электронной почты.
+This is the list of applications you have granted access to your account.: Это список приложений, которым вы предоставили доступ к вашей учетной записи.
+This link is only valid for an hour.: Ссылка действительна в течении часа.
+Thursdays: Четверги
+Timezone: Часовой пояс
+Toggle: переключать
+Token does not exist: индификатор не существует
+Too many actions in this schedule.: Слишком много действий в одном графике.
+Too many channels in this group: Слишком много каналов в этой группе
+Too many operations in this scene: Слишком много операций на сцене.
+Total time: Общее время
+Tuesdays: Вторники
+Turning this device off will cause its channels not working in the following features.: Выключение устройства приведет к тому, что его каналы перестанут работать в следующих элементах.
+Turning this device off will result in disabling features listed below.: Выключение устройства также отключит следующие элементы.
+Type: Тип
+Undo registration: Отменить регистрацию
+Unit: Единица
+Unknown: неизвестно
+Unregister my private SUPLA Cloud instance: Отменить регистрацию моего персонального экземпляра SUPLA Cloud
+Unsuccessful login attempt: Неудачный вход
+Unsupported function: Неподдерживаемая функция
+Unsupported type: Неподдерживаемый тип
+Update in progress: Идет обновление
+Uploaded files do not contain any inappropriate or copyrighted content, nor do they violate Third Party Rights and I have the right to use them.: Загруженные файлы не нарушают норм нравственности, авторских прав и прав третьих лиц, и я имею право их использовать.
+Upper voltage threshold: Порог высокого напряжения
+'Use the {0} server command to change this account''s limits. For example:': 'Чтобы изменить лимиты для этой учетной записи, используйте команду {0} на вашем сервере. Например:'
+User is already confirmed. Try to log in.: Эта учетная запись уже подтверждена. Войдите.
+Value added: Добавленное значение
+Valve: Клапан
+Valve closed manually: Клапан закрыт вручную
+Verification method: Метод проверки
+Visible: идимые
+Visit app webpage: Открыть веб-сайт приложения
+Voltage aberrations: Аберрации напряжения
+Voltage monitoring: Контроль напряжения
+WELCOME_MESSAGE: |
+  Подключить Твой дом или офис к SUPLA очень легко.
+  Для этого Тебе достаточно всего лишь перезаписать в своих устройствах управления (Вход/Выход) и смартфонах нижеприведенные данные.
+Wait a while before the next request. You can check your limits in the account settings.: Подождите немного перед выполнением следующего запроса. Вы можете проверить текущее использование ваших лимитов в настройках учетной записи.
+Wait for this scene to finish before proceeding to the next step ({time}).: Дождитесь завершения выполнения сцены перед тем, как продолжить действие ({time}).
+Water meter: Счетчик воды
+We can notify you about certain events with your account. Opt out if you don't want us to bother you.: Мы будем отправлять вам уведомления о некоторых событиях, связанных с вашей учетной записью. Вы можете отписаться от тех, которые вам не нужны.
+We could not connect to your SUPLA Cloud instance.: Не удалось подключиться к персональной инстанции облака SUPLA Cloud.
+We have been asked to delete your SUPLA Cloud account (%cloudHost%).: Мы получили запрос на удаление Вашей учетной записи в SUPLA Cloud (%cloudHost%).
+We have been asked to unregister your private SUPLA Cloud instance (%targetCloudUrl%).: Отправлен запрос на отмену регистрации вашего персонального экземпляра SUPLA Cloud (%targetCloudUrl%).
+We have just sent you an activation link. You should be receiving it shortly.: Сообщение со ссылкой для активации Вашей учетной записи было только что отправлено. Немного терпения.
+We have sent you an e-mail message with a delete confirmation link. Just to be sure!: Вам отправлено электронное письмо с ссылкой для подтверждения удаления учетной записи. Может, Вы еще передумаете!
+We have sent you an email with further instructions.: Мы отправили вам сообщение с дальнейшими инструкциями.
+We should be ready shortly.: Мы должны закончить в ближайшее время.
+We store some data (e.g. cookies) in your browser to remember your preferences and to make the application usage easier.: Мы сохраняем в вашем браузере информацию о ваших предпочтениях для облегчения использования приложения (например, с помощью механизма куки).
+We try to be faster: Мы становимся быстрее
+We were not able to find your account.: Не удалось найти вашу учетную запись.
+We will miss you: Мы будем скучать без вас
+We will use it only in justified situations.: Он используется только в обоснованных случаях.
+Weather Station: Метеостанция
+Wednesdays: Среды
+Weight sensor: Весы
+Welcome!: Добро пожаловать!
+What this token is for?: Для чего служит этот токен?
+Where is the JSON?: Где находится ДЖЕЙСОН?
+Where is your SUPLA Cloud?: Где находится ваша SUPLA?
+White: белый
+Wind sensor: Датчик ветра
+Window opening sensor: Датчик открытия окна
+With SUPLA you can operate the lights in your home or office: С SUPLĄ можно управлять светом в доме или офисе
+With function: С функцией
+Working period: Срок действия
+YOUR LINK CODE: КОД ТВОЕЙ ССЫЛКИ
+You are changing the settings too quickly. You have to wait a while before making this change.: Вы слишком быстро меняете настройки. Следует подождать некоторое время, прежде чем изменить эти настройки.
+You can ignore this message, if you have accidentally entered an incorrect password.: Вы можете проигнорировать данную информацию, если это вы указали неверный пароль.
+You can use the application but you will not be able to modify any settings.: Вы можете использовать приложение, но невозможно внести изменения в конфигурацию.
+You cannot delete your last access identifier.: Невозможно удалить свой последний идентификатор доступа.
+You cannot delete your last location.: Невозможно удалить свое последнее местоположение.
+You cannot use SUPLA project name in the domain name.: Вы не можете использовать имя проекта SUPLA в главном доменном имени.
+You have exceeded your API Rate Limit: Вы использовали свой лимит запросов для API
+You have requested to unregister your SUPLA Cloud instance: Вы попросили отменить регистрацию вашего экземпляра SUPLA Cloud
+You have to choose at least one scope.: Вы должны выбрать хотя бы один диапазон.
+You just need to execute the following command inside your host terminal.: Достаточно выполнить следующую команду внутри терминала вашего хоста.
+You may find the below examples helpful, provided that you are still willing to use the advanced schedule mode.: Если вы по-прежнему хотите использовать расширенный режим графика, взгляните на приведенные ниже примеры.
+You must agree to the Terms and Conditions.: Принятие правил является обязательным.
+You must enable MQTT Broker first.: Сначала необходимо включить интеграцию с брокером MQTT.
+You must set an action for each scene operation.: Выберите действие для каждой операции в сцене.
+You must set sections with transparent or opaque parameters or both.: Вы должны выбрать прозрачность хотя бы одного раздела.
+You need to update your SUPLA Cloud to version 2.3.0. or newer.: Вы должны обновить свой экземпляр SUPLA Cloud до версии не ниже 2.3.0.
+You will not be able to generate a direct link with the same URL again.: Создание ссылки с одинаковым URL невозможно.
+Your account and MQTT Broker connection.: Подключение вашей учетной записи к брокеру MQTT.
+Your account has been deleted. We hope you will come back to us soon.: Учетная запись удалена. Надеемся, вы скоро к нам вернетесь.
+Your account has been locked.: Ваша учетная запись заблокирована.
+Your account has not been confirmed yet.: Ваша учетная запись ещё не подтверждена.
+Your account limits: Ваши лимиты
+Your channel groups are allowed to have a maximum of {max} channels.: Ваши группы каналов могут иметь максимум {max} каналов.
+Your email: Введите почту
+Your instance is not registered or you are trying to authorize an application that is not public.: Ваша инстанция не зарегистрирована или вы пытаетесь авторизовать приложение, которое не является публичным.
+Your password must contain at least one special character.: Пароль должен содержать не менее одного специального символа.
+Your password must include at least one letter.: Пароль должен содержать не менее одной буквы.
+Your password must include at least one number.: Пароль должен содержать не менее одной цифры.
+Your password must include both upper and lower case letters.: Пароль должен содержать прописные и строчные буквы.
+Your preferences has been updated.: Ваши настройки сохранены.
+Your private SUPLA Cloud instance has been unregistered.: Ваш персональный экземпляр SUPLA Cloud был отменен.
+Your private SUPLA Cloud instance is not available. Make sure your server is online and your https connection works properly.: Ваша пользовательская установка SUPLA cloud недоступна. Убедитесь в том, что сервер доступен, а соединение HTTPS действует корректно.
+Your private SUPLA Cloud is almost registered.: Ваше персональное облако SUPLA почти зарегистрировано.
+Your private SUPLA Cloud is not registered.: Ваше личное облако SUPLA не зарегистрировано.
+Your scenes are allowed to have a maximum of {max} operations.: Ваши сцены могут иметь максимум {max} операций.
+Your schedules are allowed to have a maximum of {max} actions.: Ваши графики могут иметь максимум {max} действий.
+Your session has been expired.: Ваш сеанс завершен.
+Your session is about to expire: Ваша сессия истекает
+Your session will expire in {0}.: Ваш сеанс будет завершен через {0}.
+Yours faithfully,: Искренне Ваши,
+access to your e-mail address: доступ к вашему адресу электронной почты
+actionTrigger_HOLD: Удержание кнопки
+actionTrigger_SHORT_PRESS_X1: Нажатие 1X
+actionTrigger_SHORT_PRESS_X2: Нажатие 2x
+actionTrigger_SHORT_PRESS_X3: Нажатие 3x
+actionTrigger_SHORT_PRESS_X4: Нажатие 4X
+actionTrigger_SHORT_PRESS_X5: Нажатие 5x
+actionTrigger_TOGGLE_X1: Переключение 1x
+actionTrigger_TOGGLE_X2: Переключение 2x
+actionTrigger_TOGGLE_X3: Переключение 3x
+actionTrigger_TOGGLE_X4: Переключение 4x
+actionTrigger_TOGGLE_X5: Переключение 5x
+actionTrigger_TURN_OFF: Выключение
+actionTrigger_TURN_ON: Включение
+actionableSubjectType_channel: Канал
+actionableSubjectType_channelGroup: Группа каналов
+actionableSubjectType_scene: Сцена
+addToHistoryMeasurementWarningSelected: При выборе этого параметра будут добавлены заданные значения будущим измерениям, сохраняемым в истории. Это можно увидеть на диаграммах как внезапный рост введенного значения. Рекомендуем задавать эти параметры только при первой установке счетчика. Для существующих счетчиков рекомендуем удалить историю измерений сразу после изменения этих настроек.
+addToHistoryMeasurementWarningUnselected: При снятии этого параметра в будущих измерениях, записываемых в истории, не будут учитываться заданные значения. Это можно увидеть на диаграммах как внезапное падение. Рекомендуем задавать эти параметры только при первой установке счетчика. Для существующих счетчиков рекомендуем удалить историю измерений сразу после изменения этих настроек.
+after: после
+before: до
+caption: имя
+channel: Канал
+channelConfigHelp_gateCloseAfterHelp: Агент, запускающий процедуру закрытия ворот, может иметь задержку до одной минуты от заданного времени.
+channelConfigHelp_numberOfAttemptsGate: После вашей вашей команды открыть или закрыть ворота система попытается их закрыть/открыть и подождет 60 секунд, чтобы проверить, достигнуто ли желаемое состояние. Если нет, система снова попытается закрыть/открыть. Данный параметр определяет максимальное количество попыток достижения цели, предпринятых системой. Рекомендуемое значение - 5. Изменение этого параметра не влияет на работу графиков.
+channelConfigHelp_stateVerificationMethod: 'Активные: первый переход датчика в целевое состояние прекращает повторные попытки. Пассивные: раз в 60 секунд проверяем состояние датчика и прерываем повтор, когда датчик сообщает заданное состояние.'
+channelConfig_stateVerificationMethod_active: Активный
+channelConfig_stateVerificationMethod_passive: Пассивный
+channelGroup: Группа каналов
+choose: выбрать
+choose the action: выбрать действие
+choose the scene: выбрать сцену
+choose the timezone: выбрать часовой пояс
+click here: нажмите здесь
+copied: скопировано
+copy: копировать
+days: дни
+directLinkExecutionFailureReason_disabled: Прямая ссылка отключена
+directLinkExecutionFailureReason_executionLimitExceeded: Лимит исполнений превышен
+directLinkExecutionFailureReason_expired: Прямая ссылка просрочена
+directLinkExecutionFailureReason_forbiddenAction: Ссылка не разрешает выполнить это действие
+directLinkExecutionFailureReason_httpGetForbidden: Не удалось выполнить действия с использованием запрещенного метода HTTP GET.
+directLinkExecutionFailureReason_invalidActionParameters: Неверные параметры прямой ссылки
+directLinkExecutionFailureReason_invalidChannelState: Невозможно выполнить действие из-за состояния канала.
+directLinkExecutionFailureReason_invalidSlug: Отправленный код подтверждения неверный
+directLinkExecutionFailureReason_noAllowedActions: Никаких допустимых действий не выбрано
+directLinkExecutionFailureReason_noSlugOrAction: Неправильный запрос - требуется код ссылки либо действия
+directLinkExecutionFailureReason_notActiveYet: Прямая ссылка еще не активна
+directLinkExecutionFailureReason_otherFailure: Ошибка при выполнении действия
+directLinkExecutionFailureReason_sceneDuringExecution: Сцена находится в процессе исполнения.
+directLinkExecutionFailureReason_unsupportedAction: Выбранное действие неверно
+empty: пустой
+everyday: ежедневно
+executed: выполнено
+extend: Продолжить
+from IP: c IP
+from the IP: с адреса
+hours: часы
+min.: мин.
+minutes: Минут
+password: пароль
+register-slide1-text: С помощью простой и доступной электроники с помощью SUPLA можно создать устройства управляющие домашней автоматикой. Двери, роллеты, гаражные ворота и калитки, розетки и лампочкм, бытовая тезника и контроль температуры станут подвластны простому прикосновению пальца.
+register-slide1-title: Разработай собственную домашнюю автоматику
+register-slide2-text: Основное достоинство проекта это простота и доступность. SUPLA дает возможность управлять своим домом в любом месте Земли где есть интернет для вашего планшета или смартфона. SUPLA проект с открытым програмным кодом и дизайном электрических схем. Вы даже можете внести свой вклад в развитие SUPLA
+register-slide2-title: SUPLA везде!
+register-slide3-text: Системы Умного Дома зачастую слишком сложны и требуют монтажа во время строительства. SUPLA проста и бесплатна. Возможно построение элементов на платформах RaspberryPI, Arduino а также ESP8266 объединяя их с помощью LAN или WiFi. Присоединяйтесь к нам и постройте собственную систему автоматики своего здания!
+register-slide3-title: Бесплатно и с открыто дляя всех!
+scene: сцена
+scheduleMode_crontab: Расширенный
+scheduleMode_daily: Дневной цикл
+scheduleMode_minutely: Ежеминутный цикл
+scheduleMode_once: Одноразовый
+sec.: сек.
+smartphones, tablets, etc.: смартфоны, планшеты и т.д.
+state-closed: Закрыто
+state-default: По умолчанию
+state-empty: Пустые
+state-full: Полные
+state-humidity: Влажность
+state-off: Выключено
+state-on: Включено
+state-opened: Открыто
+state-partially_closed: Частично закрыто
+state-revealed: Открытые
+state-rgb_off_dim_off: RGB и диммер выключены
+state-rgb_off_dim_on: RGB выключен, диммер включен
+state-rgb_on_dim_off: RGB включен, диммер выключен
+state-rgb_on_dim_on: RGB и диммер включены
+state-shut: Закрытые
+state-temperature: Температура
+sunrise-after: восхода
+sunrise-before: восхода
+sunset-after: заката
+sunset-before: заката
+username: имя пользователя
+valid until: Истечет
+valveOpenConfirm_manual: Клапан был закрыт в ручном или радио режиме. Перед его открытием убедитесь, что он не был закрыт по причине затопления. Чтобы отключить предупреждение, откройте клапан вручную. Вы уверены, что хотите открыть клапан удаленно?!
+'{applicationName} will not be able to interact with your account until you grant the access again.': '{applicationName} мы не можем взаимодействовать с вашей учетной записью до повторного предоставления доступа.'
+'{clientName} wants to access your account.': '{clientName} хочет получить доступ к вашей учетной записи.'
+'{minutes} minutes after sunrise': '{minutes} минут после восхода солнца'
+'{minutes} minutes after sunset': '{minutes} минут после заката'
+'{minutes} minutes before sunrise': '{minutes} минут до восхода солнца'
+'{minutes} minutes before sunset': '{minutes} минут до заката'
+'{requests} out of {limit} / day': '{requests} из {limit} / день'
+'{requests} out of {limit} / h': '{requests} из {limit} / ч'
+'{requests} out of {limit} / min': '{requests} из {limit} / мин'
+'{requests} out of {limit} / {seconds} sec.': '{requests} из {limit} / {seconds} с'
+
+#</editor-fold>
+#<editor-fold desc="Extra translations">
+# Translations below have not been found in sources. You might want to delete them.
+...and start your adventure with building automation today!: ...и начни творить свою домашнюю автоматику!
+Access identifier password must be at least 8 characters.: Пароль для идентификатора доступа должен быть не менее 8 символов.
+Access identifier password must be no longer than 32 characters.: Пароль для идентификатора доступа не может быть длиннее 32 символов.
+Action: Акция
+Add new item to use in the scene: Добавить новый элемент на сцену
+Are you sure you want to delete the entire voltage aberrations history saved for this channel?: Вы уверены, что хотите удалить всю историю аббераций напряжения этого канала?
+Are you sure you want to disable this device?: Ты уверен, что хочешь выключить это оборудование?
+Assigned Locations: Подключенные Области
+Authorized OAuth apps: Авторизованные приложения OAuth
+Calculated value: Состояние счетчика
+Calibration successful.: Успешная калибровка
+Cannot execute an action when the device is disconnected.: Не удается выполнить действие при отключенном устройстве.
+Cannot send an activation e-mail. Try again later.: Невозможно отправить сообщение со ссылкой для активации. Пожалуйста, попробуйте позже.
+Can’t find activation email? Please check your SPAM or Junk mail folders. Alternately please {clickHereLink} to resend.: Сообщение со ссылкой для активации Вашей учетной записи не пришло? Убедитесь, что оно не попало в папку СПАМ (нежелательная почта). Вы также можете {clickHereLink}, чтобы отправить его снова.
+Channel is disconnected.: Канал отключен.
+Channel value: Значение
+Channel will be deleted from the channel group below: Канал будет удален из следующих групп каналов
+Channels in channel group: Каналы в группах каналов
+Chart data source type: Тип источника данных
+Chosen hour: Заданное время
+Coming Soon: Скоро будет
+Confirm if you want to perform the roller shutter calibration.: Подтвердите проведение калибровки модуля.
+Confirm if you want to remove {deviceName} device: Подтвердите удаление {deviceName}
+DISABLED: НЕ ИСПОЛЬЗУЕТСЯ
+Days: Дней
+Deleting your account will result also in deletion of all your data, including your connected devices, configured channels, direct links and measurement history. Deleting an account is irreversible.: Удаление учетной записи приведет к удалению всех ваших данных, включая ваши подключенные устройства, настроенные каналы, прямые ссылки и историю измерений. Удаление учетной записи является необратимым.
+Device channel value: Значение устройства
+Differential: Дифференциальный
+Direct links below will be deleted: Прямые ссылки, перечисленные ниже, будут удалены
+Doors, Gates: Двери, Калитки
+E-mail notifications: Уведомления по электронной почте
+ENABLED: ИСПОЛЬЗУЕТСЯ
+Email already exists: Адрес электронной почты уже существует
+Entering configuration mode is unsupported in the firmware.: Удаленное переключение в режим конфигурации не поддерживается прошивкой устройства.
+Existing schedules: Существующие графики
+File is too large: Размер файла слишком большой
+From IP: C IP
+Get SUPLA on your devices: Загрузи SUPLА на свое устройство
+Hi: Привет
+Hour: Час
+Hours: Часов
+I/O: Ввод/Вывод
+If you want to stay here, do something!: Если хочешь здесь остаться, сделай что-нибудь!
+If you wish to register your instance, {clickHereLink}.: Если вы хотите зарегистрировать свой экземпляр, {clickHereLink}.
+If you wish to unregister your instance, {clickHereLink}.: Если вы хотите отменить регистрацию вашего экземпляра, {clickHereLink}.
+Information: Информация
+Initial value: Начальное значение
+Input: Вход
+Interpolate measurements: Оценить недостающие значения
+It will start to broadcast its own access point that is meant to be connected with your smartphone to configure its connection settings and/or update the firmware.: В этом режиме устройство начнет транслировать свою сеть Wi-Fi, целью которой является настройка устройства или обновление прошивки с помощью смартфона, который подключится к этой сети.
+Keep in mind, that the humanized description of the entered crontab is not perfect. It is meant to help you find appropriate value, not to validate your input. Pay attention to the "Closest executions" section for final confiration that the schedule you configured behaves as expected.: Имейте в виду, что описание данного выражения, представленное приложением, не является идеальным, и его единственная задача - помочь вам ввести соответствующее значение. Он не используется для проверки правильности введенного значения или, тем более, чтобы похвастаться, что «"нашлась ошибка в SUPLA"». После внесения изменений проверьте раздел «"Ближайшие исполнения"», чтобы подтвердить, что указанная конфигурация графика соответствует вашим ожиданиям.
+Languages: Язык
+Loading: Зарядка
+Location password must be at least 4 characters.: Пароль для локализации должен быть не менее 4 символов.
+Location password must be no longer than 32 characters.: Пароль для локализации не может быть длиннее 32 символов.
+Minute: Минута
+Mobile Apps: Мобильное приложение
+Next: Далее
+No results match {0}: Результаты не подходят для {0}
+Number: Номер
+OAuth application: Приложение OAuth
+Output: Выход
+Please select the schedules that should also be enabled.: Отметь графики, которые тоже должны быть включены.
+Previous login: Предидущий вход
+Registration: Регистрация
+Remove: Удалить
+Save changes to see Access IDs: Сохранить изменения для получения идентификаторов доступа
+Schedule cannot be enabled: Не получилось запустить график
+Schedules below will be deleted: Следующие графики будут удалены
+Sensor (normal closed): Датчик (нормально закрытый)
+Sensor (normal open): Датчик (нормально открытый)
+Shut the roller until it touches the bottom and type the percentage of closing in. This is not required but will improve the visualization of the roller state in the mobile application when provided.: Закрывайте роллету, пока она не коснется нижнего края, и назначьте ей процент закрытия в этом поле. Эта операция не требуется, но ее добавление улучшит визуализацию положения роллеты в мобильном приложении.
+Sources available from: Исходный код доступен на
+Standard: Стандартные
+Subject: Субъект
+Sunrise / Sunset: Восход/Закат
+Supla for devices: Supla для устройств
+Thanks to integrations, you can easily add new features to your account using solutions provided by external suppliers, developers or by yourself.: Благодаря интеграциям вы можете легко добавлять новые функции в свою учетную запись, используя решения, предоставляемые сторонними поставщиками, разработчиками, или свои собственные.
+The notification marked with a border is the one you saw when you clicked the unsubscribe link.: С помощью рамки мы отметили уведомление, из которого вы нажали ссылку для отмены регистрации.
+The relay has been turned off due to a current overload. Before you turn it on, make sure you took required steps to solve the problem. Are you sure you want to turn it on remotely?: Устройство отключено защитой от перепада напряжения. Прежде чем включить его, убедитесь, что устранена проблема, которая к этому привела. Вы уверены, что хотите включить это устройство удаленно?
+This schedule mode is meant to be used by advanced or patient users only. You need to specify schedule execution behavior in a Crontab notation (extended by some SUPLA flavours). You may find the crontab.guru website helpful, if you have not came across crontabs yet.: Этот режим графика предназначен для технических или очень терпеливых пользователей. Он требует, чтобы вы указали триггерные моменты графика в нотации crontab, обогащенной несколькими функциональными возможностями, встречающимися только в SUPLA. Если вы еще не встречались с crontab и по-прежнему хотите использовать этот режим, сайт crontab.guru может оказаться для вас полезным.
+This trigger is used by the device itself (e.g. it turns on the light or starts the roller shutter). Setting any action on this trigger will disable the local function.: Этот триггер используется локально устройством (например, включает свет, управляет роллетой и т. д.) Если назначить ему другое действие, то локальная функция отключится.
+Triggers: Триггеры
+Try again later: Попытайся повторно задать команду
+Turning this device off will result in disabling all the associated schedules.: Выключение этого оборудования приведет  к одновременному выключению графиков, которые с ним соединены.
+Use working schedule for this access identifier: Используйте график доступности для этого идентификатора доступа
+Value per unit: Значение на единицу
+We will try to display the received icons the best possible way, however you will obtain the greatest results by sending us over a PNG file with a transparent background, width {width}px and height {height}.: Мы сделаем все возможное, чтобы загруженные значки отображались оптимально, но наилучшие результаты вы получите, загрузив PNG-файлы с прозрачным фоном и шириной {width} и высотой {height} пикселей.
+When: Когда
+When you execute the link with HTTP PATCH method, you can omit the random part of the link and send it in the request body. This is safer because such request will not be stored in any server or proxy logs, regardless of their configuration. Please find an cURL example request below.: Ссылка может быть открыта при подаче ее уникального идентификатора в тексте запроса HTTP PATCH. Это безопаснее, так как предотвращает сохранение полного адреса Вашей ссылки в журналах доступа серверов, через которые проходит Ваш запрос. Пример выполнения при помощи инструмента cURL приведен ниже.
+Working schedule: График действий
+You need to provide icons for all states.: Вы должны назначить значки для всех состояний.
+You will be logged out shortly: В течение нескольких секунд система удалит тебя как пользователя
+Your device supports extending its behavior by executing any desired action on any device that you own. Depending on the firmware, it may support different triggers (often limited by the hardware).: Устройство позволяет расширить его функциональность и выполнять любое действие на любом устройстве, которое у вас есть. Доступные параметры зависят от используемой прошивки и устройства.
+choose a currency: выбрать валюту
+choose the channel: выбери канал
+choose the channel group: выбрать группу каналов
+execute: выполни
+hourly: Ежечасный цикл
+or add a delay: или добавить задержку
+prefix: префикс
+reset chart view: вернуться к первоначальному виду
+suffix: суффикс
+
+#</editor-fold>
+#<editor-fold desc="Missing translations">
+# Translations below are missing. You want to translate them.
+'% of closing': ~
+A confirmation upon successful device unlocking.: ~
+A new client app: ~
+A new device: ~
+Account notifications: ~
+Action confirmation: ~
+Action trigger for channel: ~
+Action trigger notification: ~
+Active applications: ~
+Active from: ~
+Active sessions: ~
+Active to: ~
+Active web sessions: ~
+Activity conditions: ~
+Activity schedule: ~
+Add a new action to the scene: ~
+Add new data source: ~
+Additional time margin: ~
+Address: ~
+Adjust temperature: ~
+Adjust temperatures: ~
+Aggregation: ~
+Alarm armament sensor: ~
+Alarm at level (and above) should be greater than the corresponding warning level.: ~
+Alarm at level (and below) should be lower than the corresponding warning level.: ~
+Alarm level: ~
+Algorithm: ~
+Algorithms available on this device: ~
+All events: ~
+All logs has been downloaded. Reload the chart to see them.: ~
+All programs must define at least one temperature threshold.: ~
+Always decrement: ~
+Always increment: ~
+Anti-freeze and overheat protection: ~
+Anti-freeze protection: ~
+Application: ~
+Applications with access: ~
+Are you sure you want to change channel’s location?: ~
+Are you sure you want to change channel’s visibility?: ~
+Are you sure you want to change device’s location?: ~
+Are you sure you want to delete the events from the voltage aberrations history?: ~
+Are you sure you want to delete this channel?: ~
+Are you sure you want to delete this reaction?: ~
+Are you sure you want to delete this subdevice?: ~
+Are you sure you want to log out this device?: ~
+Arithmetic balance: ~
+Attribute: ~
+Authentication failure: ~
+Authentication successful: ~
+Auto-close on flood: ~
+Automatic: ~
+Automatic front panel turn off: ~
+Automatic front panel turn off after: ~
+Automatic thermostat: ~
+Automatic time synchronization: ~
+Aux thermometer: ~
+Aux thermometer for channel: ~
+Aux thermometer type: ~
+Available variables: ~
+Average: ~
+Battery cover open: ~
+Battery health: ~
+Battery level: ~
+Baudrate: ~
+Behavior settings: ~
+Binary sensor: ~
+Binary sensor for channel: ~
+Body: ~
+Bridge node online: ~
+Bridge node signal strength: ~
+Brightness adjustment for automatic mode: ~
+Brightness level: ~
+Button volume: ~
+Buttons upside down: ~
+By signing in, you are authorizing {clientName} to control your devices.: ~
+Calibration lost: ~
+Candle: ~
+Cannot execute an action when the channel is not available.: ~
+Cannot update OCR settings. Try again in a while.: ~
+Change percentage by: ~
+Change percentage to: ~
+Change the password and log out: ~
+Change tilt by: ~
+Change tilt to: ~
+Change to be the same.: ~
+Changing channel’s visibility will also change the visibility of other items.: ~
+Changing the location will also imply changing the location of the following items.: ~
+Channel available for {serviceName}: ~
+Channel notification: ~
+Channels that are meant to work with each other must be in the same location.: ~
+Channels that are meant to work with each other must have the same visibility setting.: ~
+Chart aggregated balance: ~
+Check available updates: ~
+Choose many: ~
+Choose the channel: ~
+Choose the channel group: ~
+Choose the scene: ~
+Choose the schedule: ~
+City: ~
+Clock error: ~
+Close value: ~
+Collapse: ~
+Collapse or stop: ~
+Collapse partially: ~
+Colon: ~
+Comma: ~
+Command has been sent to the device. Try refreshing the photo in a while.: ~
+Common currencies: ~
+Configuration not available yet. Waiting for the device to connect.: ~
+Confirm if you want to perform the calibration.: ~
+Confirm new password: ~
+Confirmation: ~
+Conflict: ~
+Connection uptime: ~
+Container: ~
+Container level sensor: ~
+Container supports up to 10 sensors.: ~
+Cool to: ~
+Cooling mode: ~
+'Cooling: {percent}%': ~
+Costs: ~
+Could not add the data source. Try again in a while.: ~
+Could not check updates.: ~
+Could not perform factory reset.: ~
+Could not perform firmware update.: ~
+Could not restart the device.: ~
+Could not send the identify command.: ~
+Could not set device password.: ~
+Could not set the device time.: ~
+Counter: ~
+Counter reset: ~
+Counter type: ~
+Create new reaction: ~
+Created: ~
+Current: ~
+Curtain: ~
+Dark mode: ~
+Data: ~
+Data limits: ~
+Data source channels: ~
+Data source type: ~
+Data sources: ~
+Data sources are virtual channels that can provide data for your account.: ~
+Data sources limit has been exceeded: ~
+Date and time: ~
+Date range: ~
+Daytime criteria: ~
+Default (exact value depends on a device): ~
+Default channels location: ~
+Dependencies: ~
+'Device GUID: %deviceGuid%': ~
+Device date and time: ~
+Device identification is unsupported in the firmware.: ~
+Device interface: ~
+Device notification: ~
+Device should be checking and installing updates.: ~
+Device should be restarting now.: ~
+Device time has been set.: ~
+Different than on master thermostat.: ~
+Differential thermostat: ~
+Do you want to set related channels like thermometers and sensors to be the same as in the master channel?: ~
+Does it look good?: ~
+Domestic hot water: ~
+Download measurements history: ~
+Dryer: ~
+E-mail: ~
+Each container level sensor must have different fill level.: ~
+Edit area crop: ~
+Edit program settings: ~
+Edit reaction: ~
+Electricity meter active power history: ~
+Electricity meter current history: ~
+Electricity meter device has no available counters configured. Please upgrade the device firmware and try again.: ~
+Electricity meter voltage aberrations history: ~
+Electricity meter voltage history: ~
+Enable floor temperature control: ~
+Enable generic cooler temperature control: ~
+Enable generic heater temperature control: ~
+Enable power status LED: ~
+Enable support for OCR readings for this channel: ~
+Enable water temperature control: ~
+Enabled phases: ~
+Energy attribute: ~
+Energy prices: ~
+Everyone makes mistakes!: ~
+Example value: ~
+Expand: ~
+Expand or stop: ~
+Expand partially: ~
+Expires at: ~
+External sensor disabling the thermostat: ~
+Facade blind operation: ~
+Factory reset: ~
+Fan: ~
+'Field: {propertyPath}.': ~
+File format: ~
+Fill level: ~
+Fill missing data: ~
+Filtering time: ~
+Firmware: ~
+Firmware update is available.: ~
+Firmware update policy: ~
+Firmware updates: ~
+Firmware version: ~
+Flood sensor: ~
+Flood sensor for valve: ~
+Flood sensors: ~
+For a period: ~
+Forced off by sensor: ~
+From: ~
+Full tilting time: ~
+Function disabled: ~
+General purpose meter: ~
+Go to the channel: ~
+Go to the channel group: ~
+Go to the scene: ~
+Go to the schedule: ~
+HVAC: ~
+Heat or cold source switch: ~
+Heat or cold source switch for channel: ~
+Heat to: ~
+Heating / ventilation / air conditioning: ~
+Heating mode: ~
+'Heating: {percent}%': ~
+High threshold: ~
+High value: ~
+History: ~
+Home screen content: ~
+Hotel card sensor: ~
+I understand that my SUPLA account will be permanently deleted.: ~
+IP: ~
+IP Address: ~
+Identify device: ~
+Identify request sent.: ~
+If you confirm the installation and wish to unlock this device, please click the link below.: ~
+If you do not want to unlock this device, please do not click the link. It will automatically expire after 24 hours.: ~
+Image: ~
+Image area crop: ~
+Increment and decrement: ~
+Incremental: ~
+Info: ~
+Installer e-mail address: ~
+Integrations settings: ~
+Invalid channel type ({typeCaption} - {typeId}) received in registration.: ~
+Invalid e-mail address.: ~
+Invalid sensor state: ~
+Invalid unlock code.: ~
+Invalid username or password: ~
+LED settings: ~
+Last connection reset cause: ~
+Last paired device: ~
+Level sensor: ~
+Level sensor for container: ~
+Level sensors: ~
+Light mode: ~
+Light source operating time: ~
+Lighting level: ~
+Lighting mode: ~
+List of available variables: ~
+Lock type: ~
+Locked: ~
+Log out: ~
+Logs transformation: ~
+Low threshold: ~
+Low threshold must be less than high threshold.: ~
+Low value: ~
+MAC: ~
+Main thermometer: ~
+Main thermometer for channel: ~
+Master thermostat: ~
+Master thermostat for channel: ~
+Max: ~
+Maximum: ~
+Maximum duration is one year.: ~
+Measurement settings: ~
+Min: ~
+Minimum: ~
+Minimum OFF time before cooling can be turned on: ~
+Minimum OFF time before heating can be turned on: ~
+Minimum OFF time before heating/cooling can be turned on: ~
+Minimum ON time before cooling can be turned off: ~
+Minimum ON time before heating can be turned off: ~
+Minimum ON time before heating/cooling can be turned off: ~
+Minimum temperature must be lower than maximum temperature.: ~
+Missing action.: ~
+'Mode: cool': ~
+'Mode: heat': ~
+'Mode: off': ~
+Motion sensor: ~
+Motor problem: ~
+Motor upside down: ~
+Mute alarm: ~
+Mute alarm sound without additional auth: ~
+Mute command sent: ~
+NORMAL USE. Use the energy as usual.: ~
+Network: ~
+New reaction: ~
+New version: ~
+'No': ~
+No one: ~
+No results: ~
+No, take me back!: ~
+Noop: ~
+Not available: ~
+Not calibrated: ~
+Notification: ~
+Notification body is set by the firmware.: ~
+Notification must have a body.: ~
+Notification must have recipients.: ~
+Notification title is set by the firmware.: ~
+Notifications: ~
+Notifications (defined): ~
+Notifications (sent per hour): ~
+'OCR service responded with error: {statusCode}. {description}': ~
+'OCR service responded with error: {status}': ~
+OCR settings: ~
+OK: ~
+OR: ~
+Off with duration: ~
+On with duration: ~
+Open Weather Data: ~
+Open value: ~
+Opening sensor for channel: ~
+Operating time: ~
+Operation: ~
+Our brilliant code detected that the value {value} should not be accepted as a valid measurement, based on the counter history, the quality of the photo and other minor factors.: ~
+Output value on error: ~
+Overcurrent threshold: ~
+Overheat protection: ~
+P/C: ~
+PIN: ~
+PIN for Google must have a length between {minLength} and {maxLength} digits.: ~
+Pair new devices or sensors: ~
+Pairing request sent.: ~
+Password changed: ~
+Password is too long.: ~
+Password is too short.: ~
+Password reset: ~
+Password should be at least 8 characters long and contain at least one uppercase, one lowercase letter and one number.: ~
+Percentage of extension: ~
+Perform firmware update: ~
+Phase: ~
+Phase LED type: ~
+Phase {phaseNumber}: ~
+Photo history: ~
+Photo interval: ~
+Please confirm if you want to do this.: ~
+Please fill all the fields: ~
+Please find the device details below.: ~
+Please fix the problems with operations and try again.: ~
+Please note, that the device mentioned in this message should be installed by certified SUPLA installers only.: ~
+Please provide the installer e-mail address to request the device unlock.: ~
+Please select a condition: ~
+Please select and configure the action: ~
+Please specify a valid address between 1 and 247.: ~
+Power active: ~
+Power apparent: ~
+Power reactive: ~
+Predefined time ranges: ~
+Program {programNo}: ~
+Projector screen: ~
+Pump switch: ~
+Pump switch for channel: ~
+Push: ~
+Push notifications limit has been exceeded: ~
+RECOMMENDED USE. Take advantage of excess energy.: ~
+Reaction notification: ~
+Reactions: ~
+Reactions limit has been exceeded: ~
+Reading: ~
+Recipients: ~
+Recipients for push notifications: ~
+Reference to the deleted channels will be removed from the items below.: ~
+Refresh interval: ~
+Refresh the config: ~
+Refreshing the configuration will overwrite the changes you made here.: ~
+Reload last photo: ~
+Reload the chart: ~
+Remember that this is not your account. You have been trusted by the user when you were given the technical access password.: ~
+Remote restart is unsupported in the firmware.: ~
+Remove this item: ~
+Request device unlock: ~
+Reset to defaults: ~
+Restart device: ~
+Restart the device: ~
+Reveal or stop: ~
+Role: ~
+Roller garage door: ~
+S/N: ~
+SUPLA - Confirm unlocking device for authorized installers: ~
+SUPLA - Test e-mail: ~
+SUPLA – your device has been unlocked!: ~
+Same as on master thermostat.: ~
+Scene ID{id} is being executed right now.: ~
+Scene ID{id} is inactive right now.: ~
+Scene available for {serviceName}: ~
+Scene notification: ~
+Screen brightness: ~
+Security: ~
+Security log: ~
+Selected: ~
+Selected device has been logged out.: ~
+Send a notification: ~
+Send notification: ~
+Sensitivity: ~
+Septic tank: ~
+Serial: ~
+Set HVAC parameters: ~
+Set the configuration password: ~
+Set the device time: ~
+Set the password that restricts access to the device configuration page (https://192.168.4.1).: ~
+Set values for each phase separately: ~
+Settings: ~
+Settings have not been saved!: ~
+Show data: ~
+Shut or stop: ~
+Slat angle that the blind sets when closing: ~
+Slat angle that the blind sets when opening: ~
+Slave timeout (ms): ~
+Some features depend on this channel: ~
+Some of the data collected for your account will be automatically cleared after certain period of time. Please find the details below.: ~
+Sound alarm on: ~
+Status LED: ~
+Stop bits: ~
+Store active power history: ~
+Store current history: ~
+Store voltage history: ~
+'Subdevice #{id}': ~
+Subfunction: ~
+Summary for selected time range: ~
+Switch cycle count: ~
+Switch to manual mode: ~
+Switch to program mode: ~
+THEN: ~
+Tab: ~
+Take a photo now: ~
+Temperature control type: ~
+Temperature difference is too big between {min}°C and {max}°C.: ~
+Temperature setpoint change switches to manual mode: ~
+Temperatures that can be set from local UI: ~
+Temporal override: ~
+Terrace awning: ~
+The channel has been deleted.: ~
+The device could not be unlocked.: ~
+The device has been unlocked already.: ~
+The device has been unlocked.: ~
+The device has channel conflict and cannot work.: ~
+The device is locked: ~
+The device is not connected. The values below represent the last known state.: ~
+The device that uses this session will loose access to the SUPLA Cloud and will need to reauthenticate.: ~
+The entire history of the voltage aberrations from phase {phaseNumber} will be removed from this channel.: ~
+The entire history of the voltage aberrations will be removed from this channel.: ~
+The following channels will be also removed along with their dependencies.: ~
+The items below depend on the deleted channels, so they will be deleted, too.: ~
+The master termostat you chose already has a master.: ~
+The notification marked with an orange background is the one you saw when you clicked the unsubscribe link.: ~
+The notification must have a recipient.: ~
+The reaction has been added: ~
+The reaction has been changed: ~
+The subdevice has been deleted.: ~
+The thermostat will not work if the main thermometer is not set.: ~
+Thermometer error: ~
+Thermometers configuration: ~
+Thermostat program settings are inherited from the master thermostat for this channel. Please visit its configuration to alter it.: ~
+Thermostat programs: ~
+This action will result in restarting the device. It will not be available for a while.: ~
+This action will result in trying to update the device firmware. It will not be available for a while.: ~
+This channel was missing during last device registration attempt.: ~
+This device cannot be remotely awakened. We are awaiting communication from the device...: ~
+This is only a test to see if the e-mail configuration is working.: ~
+This is the final step in the deletion process. Completing the form will result in an irreversible data loss.: ~
+This is the last photo sent from the photo device. Please select the area where our system should look for the measurement.: ~
+This is the list of configured notifications. If you want to add a new notification or alter the existing one, go to the channel details that should trigger it.: ~
+This is the list of configured reactions. If you want to add a new reaction, go to the channel details that should trigger it.: ~
+'This password will protect your home. Therefore, it must:': ~
+This thermostat is controlled by another device.: ~
+Tilt angle: ~
+Tilt control type: ~
+Tilt percent: ~
+Time: ~
+Timeout: ~
+Title: ~
+To: ~
+Today, it would be active from {from} to {to}.: ~
+Too small difference between aux setpoint temperatures.: ~
+Too small difference between freeze and overheat protection temperatures.: ~
+Total: ~
+Turn off: ~
+Unknown browser: ~
+Unlock the device: ~
+Unsuccessful login attempt to SUPLA-CLOUD (%cloudHost%) with the use of your email address.: ~
+Until a date and time: ~
+Until the next change: ~
+Updating...: ~
+Uptime: ~
+Use activity schedule: ~
+Use device default: ~
+Use {theMasterThermostat} to control this device.: ~
+Used current transformer type: ~
+User interface: ~
+Value: ~
+Value divider: ~
+Value multiplier: ~
+Value separator: ~
+Valve supports up to 20 sensors.: ~
+Vector balance: ~
+Vertical blind: ~
+Visit the master thermostat page.: ~
+Voltage: ~
+Waiting: ~
+Warning and alarm at level (and above) should be higher than the warning and alarm at level (and below).: ~
+Warning level: ~
+Water tank: ~
+'We also strongly advise you to choose a password that:': ~
+We received an attempt to unlock a SUPLA device distributed for authorized installers only. The request came from the %deviceUserEmail% user from the SUPLA Cloud instance at %targetCloudUrl%.: ~
+We were not able to prepare your data. Please see the error details below.: ~
+We will miss you!: ~
+Weather: ~
+Weather attribute: ~
+Week: ~
+Weekly schedule: ~
+When a certain distance is reached: ~
+When a flood is detected: ~
+When a flooding state changes: ~
+When a flooding state has been cleared: ~
+When a lack of liquid is detected: ~
+When a new mail comes: ~
+When flooding is detected: ~
+When liquid is detected: ~
+When liquid or lack thereof is detected: ~
+When motion starts to be detected: ~
+When motion stops to be detected: ~
+When the RGB lighting brightness level changes: ~
+When the RGB lighting reaches a certain level of brightness: ~
+When the active power will be: ~
+When the alarm is armed: ~
+When the alarm is armed or disarmed: ~
+When the alarm is disarmed: ~
+When the alarm starts: ~
+When the alarm stops: ~
+When the apparent power will be: ~
+When the balanced forward active energy will be: ~
+When the balanced reverse active energy will be: ~
+When the battery cover is opened: ~
+When the battery level will be: ~
+When the battery reaches a certain level: ~
+When the brightness level changes: ~
+When the brightness will be: ~
+When the calibration fails: ~
+When the calibration has been lost: ~
+When the calibration has started: ~
+When the clock error has been reported: ~
+When the color changes: ~
+When the condition is met: ~
+When the current will be: ~
+When the curtain position changes: ~
+When the curtain reaches a certain position: ~
+When the depth changes: ~
+When the depth is: ~
+When the device is turned off: ~
+When the device is turned on: ~
+When the device is turned on or off: ~
+When the device starts to be powered from battery: ~
+When the device stops to be powered from battery: ~
+When the dimmer brightness level changes: ~
+When the dimmer reaches a certain brightness level: ~
+When the distance changes: ~
+When the distance will be: ~
+When the door will be closed: ~
+When the door will be opened: ~
+When the door will be opened or closed: ~
+When the electricity meter reaches a certain value: ~
+When the electricity meter value changes: ~
+When the electricity meter value will be: ~
+When the facade blind position changes: ~
+When the facade blind reaches a certain position: ~
+When the fill level becomes known again: ~
+When the fill level becomes unknown: ~
+When the fill level changes: ~
+When the fill level reaches a certain value: ~
+When the fill level will be: ~
+When the forward active energy will be: ~
+When the garage door will be closed: ~
+When the garage door will be opened: ~
+When the garage door will be opened or closed: ~
+When the gas meter value changes: ~
+When the gas meter value reaches a certain value: ~
+When the gas meter value will be: ~
+When the gate will be closed: ~
+When the gate will be opened: ~
+When the gate will be opened or closed: ~
+When the gateway will be closed: ~
+When the gateway will be opened: ~
+When the gateway will be opened or closed: ~
+When the heat meter value changes: ~
+When the heat meter value reaches a certain value: ~
+When the heat meter value will be: ~
+When the hotel card has been taken: ~
+When the hotel card is put in: ~
+When the hotel card is put in or has been taken: ~
+When the humidity changes: ~
+When the humidity reaches a certain level: ~
+When the humidity will be: ~
+When the lighting reaches a certain level of brightness: ~
+When the mail comes or is taken: ~
+When the mail has been taken: ~
+When the meter reaches a certain value: ~
+When the meter value changes: ~
+When the meter value will be: ~
+When the motor reported a problem: ~
+When the position reaches: ~
+When the precipitation amount will be: ~
+When the pressure changes: ~
+When the pressure reaches a certain level: ~
+When the pressure will be: ~
+When the projector screen position changes: ~
+When the projector screen reaches a certain position: ~
+When the pump is turned off: ~
+When the pump is turned on: ~
+When the pump is turned on or off: ~
+When the rain amount changes: ~
+When the reactive power will be: ~
+When the reverse active energy will be: ~
+When the roller garage door position changes: ~
+When the roller garage door reaches a certain position: ~
+When the roller shutter position changes: ~
+When the roller shutter reaches a certain position: ~
+When the roller shutter will be closed: ~
+When the roller shutter will be opened: ~
+When the roller shutter will be opened or closed: ~
+When the roof window position changes: ~
+When the roof window reaches a certain position: ~
+When the roof window will be closed: ~
+When the roof window will be opened: ~
+When the roof window will be opened or closed: ~
+When the sensor state changes: ~
+When the sensor state changes to hi: ~
+When the sensor state changes to low: ~
+When the sensors state becomes invalid: ~
+When the sensors state becomes valid: ~
+When the sound alarm starts: ~
+When the sound alarm stops: ~
+When the temperature changes: ~
+When the temperature reaches a certain value: ~
+When the temperature will be: ~
+When the terrace awning position changes: ~
+When the terrace awning reaches a certain position: ~
+When the thermometer error has been reported: ~
+When the thermostat starts cooling: ~
+When the thermostat starts heating: ~
+When the thermostat starts heating or cooling: ~
+When the thermostat starts or stops cooling: ~
+When the thermostat starts or stops heating: ~
+When the thermostat starts or stops heating or cooling: ~
+When the thermostat stops cooling: ~
+When the thermostat stops heating: ~
+When the thermostat stops heating or cooling: ~
+When the value reaches a certain level: ~
+When the value value changes: ~
+When the value value will be: ~
+When the value will be: ~
+When the valve is closed: ~
+When the valve is manually closed: ~
+When the valve is opened: ~
+When the valve is opened or closed: ~
+When the vertical blind position changes: ~
+When the vertical blind reaches a certain position: ~
+When the voltage will be: ~
+When the warning starts: ~
+When the warning stops: ~
+When the water meter reaches a certain value: ~
+When the water meter value changes: ~
+When the water meter value will be: ~
+When the weight changes: ~
+When the weight will be: ~
+When the wind reaches a certain speed: ~
+When the wind speed changes: ~
+When the wind speed will be: ~
+When the window will be closed: ~
+When the window will be opened: ~
+When the window will be opened or closed: ~
+When there is certain amount of rain: ~
+When there weight reaches a certain value: ~
+Who has access?: ~
+Wi-Fi RSSI: ~
+Wi-Fi signal strength: ~
+Will be deleted after: ~
+With a timer: ~
+With great power comes great responsibility.: ~
+'Yes': ~
+You are using technical access.: ~
+You can browse only the most recent logs now. Wait a while for the full history.: ~
+You can set relative values here. For example +10 or -20 will make the setting larger by 10 or smaller by 20, respectively.: ~
+You cannot change this function becuase it is required by another channel.: ~
+You cannot to set a master thermostat for a channel that is master for others.: ~
+You have requested the device to be unlocked by the installer. We will notify you when they confirm your request.: ~
+You have the newest firmware installed.: ~
+You must leave at least one phase enabled.: ~
+You must set an action for each reaction.: ~
+You need to provide icons for all states in light mode.: ~
+Your chart is being drawn...: ~
+Your data are being collected. Please be patient.: ~
+Your data are being fetched from the server. Wait for it to complete before exporting your logs.: ~
+Your device has been unlocked by the installer.: ~
+actionableSubjectType_notification: ~
+actionableSubjectType_schedule: ~
+activityConditions_help: ~
+and wait until it reaches: ~
+and wait until it will be: ~
+and wait until the battery level will be: ~
+and wait until the fill level will be: ~
+and wait until the humidity will be: ~
+and wait until the meter will be: ~
+and wait until the temperature will be: ~
+and wait until the value will be: ~
+auxThermometerType_DISABLED: ~
+auxThermometerType_FLOOR: ~
+auxThermometerType_GENERIC_COOLER: ~
+auxThermometerType_GENERIC_HEATER: ~
+auxThermometerType_NOT_SET: ~
+auxThermometerType_WATER: ~
+average: ~
+battery: ~
+be at least {numChars} characters long: ~
+blue, otherwise: ~
+blue, when voltage lower than the low threshold: ~
+change: ~
+choose the access identifiers: ~
+choose the city: ~
+choose the currency: ~
+choose the schedule: ~
+closeValveOnFloodType_ALWAYS: ~
+closeValveOnFloodType_ON_CHANGE: ~
+closeValveOnFloodType_help: ~
+configuration missing: ~
+contains a character that is neither a letter nor a digit: ~
+contains a digit: ~
+contains lower and upper letters: ~
+cool: ~
+day: ~
+default: ~
+directLinkExecutionFailureReason_sceneDuringInactivePeriod: ~
+energyPriceForecast_field_fixing1: ~
+energyPriceForecast_field_fixing2: ~
+energyPriceForecast_field_rce: ~
+firmwareUpdatePolicy_ALL_ENABLED: ~
+firmwareUpdatePolicy_DISABLED: ~
+firmwareUpdatePolicy_FORCED_OFF: ~
+firmwareUpdatePolicy_SECURITY_ONLY: ~
+green, otherwise: ~
+green, when power less than the low threshold: ~
+heat: ~
+homeScreenContent_MAIN_AND_AUX_TEMPERATURE: ~
+homeScreenContent_MODE_OR_TEMPERATURE: ~
+homeScreenContent_NONE: ~
+homeScreenContent_TEMPERATURE: ~
+homeScreenContent_TEMPERATURE_AND_HUMIDITY: ~
+homeScreenContent_TEMPERATURE_TIME: ~
+homeScreenContent_TIME: ~
+homeScreenContent_TIME_DATE: ~
+homeScreenContent_offMode_ALWAYS_ENABLED: ~
+homeScreenContent_offMode_DISABLE: ~
+homeScreenContent_offMode_ENABLED_WHEN_DARK: ~
+hour: ~
+is at least {numChars} characters long: ~
+keepHistoryMeasurementWarningSelected: ~
+last 24 hours: ~
+last 30 days: ~
+last 6 hours: ~
+last 7 days: ~
+lastConnectionResetCause_ACTIVITY_TIMEOUT: ~
+lastConnectionResetCause_SERVER_CONNECTION_LOST: ~
+lastConnectionResetCause_UNKNOWN: ~
+lastConnectionResetCause_WIFI_CONNECTION_LOST: ~
+localUILock_FULL: ~
+localUILock_TEMPERATURE: ~
+localUILock_UNLOCKED: ~
+logs_aggregation_day: ~
+logs_aggregation_hour: ~
+logs_aggregation_minute: ~
+logs_aggregation_month: ~
+mains: ~
+max: ~
+midnight: ~
+milliseconds: ~
+min: ~
+modbusRole_MASTER: ~
+modbusRole_NOT_SET: ~
+modbusRole_SLAVE: ~
+modbusSerialStopbits_ONE: ~
+modbusSerialStopbits_ONE_AND_HALF: ~
+modbusSerialStopbits_TWO: ~
+normal session: ~
+notification: ~
+ocrLightingMode_ALWAYS_ON: ~
+ocrLightingMode_AUTO: ~
+ocrLightingMode_OFF: ~
+'off': ~
+openWeatherAttribute_field_airCo: ~
+openWeatherAttribute_field_airNo: ~
+openWeatherAttribute_field_airNo2: ~
+openWeatherAttribute_field_airO3: ~
+openWeatherAttribute_field_airPm10: ~
+openWeatherAttribute_field_airPm25: ~
+openWeatherAttribute_field_feelsLike: ~
+openWeatherAttribute_field_humidity: ~
+openWeatherAttribute_field_pressure: ~
+openWeatherAttribute_field_rainMmh: ~
+openWeatherAttribute_field_snowMmh: ~
+openWeatherAttribute_field_temp: ~
+openWeatherAttribute_field_tempHumidity: ~
+openWeatherAttribute_field_visibility: ~
+openWeatherAttribute_field_windGust: ~
+openWeatherAttribute_field_windSpeed: ~
+or another element: ~
+previous month: ~
+range: ~
+red, when power higher than the high threshold: ~
+red, when voltage higher than the high threshold: ~
+schedule: ~
+seconds: ~
+state-half: ~
+state-hi: ~
+state-low: ~
+statusLed_ALWAYS_OFF: ~
+statusLed_OFF_WHEN_CONNECTED: ~
+statusLed_ON_WHEN_CONNECTED: ~
+subdevicePairingResult_CMD_RESULT_UNKNOWN: ~
+subdevicePairingResult_NOT_STARTED_BUSY: ~
+subdevicePairingResult_NOT_STARTED_NOT_READY: ~
+subdevicePairingResult_NOT_SUPPORTED: ~
+subdevicePairingResult_NO_NEW_DEVICE_FOUND: ~
+subdevicePairingResult_ONGOING: ~
+subdevicePairingResult_PAIRING_RESULT_UNKNOWN: ~
+subdevicePairingResult_PROCEDURE_STARTED: ~
+subdevicePairingResult_REQUEST_SENT: ~
+subdevicePairingResult_RESOURCES_LIMIT_EXCEEDED: ~
+subdevicePairingResult_SUCCESS: ~
+subdevicePairingResult_UNAUTHORIZED: ~
+sum: ~
+sunrise: ~
+sunset: ~
+swap: ~
+tank_alarm_alarmAboveLevel: ~
+tank_alarm_alarmBelowLevel: ~
+tank_alarm_fullRange_alarmAboveLevel: ~
+tank_alarm_fullRange_alarmBelowLevel: ~
+tank_alarm_fullRange_warningAboveLevel: ~
+tank_alarm_fullRange_warningBelowLevel: ~
+tank_alarm_warningAboveLevel: ~
+tank_alarm_warningBelowLevel: ~
+temperatureControlType_AUX_HEATER_COOLER_TEMPERATURE: ~
+temperatureControlType_ROOM_TEMPERATURE: ~
+the master thermostat ID{id}: ~
+the whole history: ~
+then execute the action: ~
+thermostatAlgorithmHelp_ON_OFF_SETPOINT_AT_MOST: ~
+thermostatAlgorithmHelp_ON_OFF_SETPOINT_MIDDLE: ~
+thermostatAlgorithmHelp_PID: ~
+thermostatAlgorithm_ON_OFF_SETPOINT_AT_MOST: ~
+thermostatAlgorithm_ON_OFF_SETPOINT_MIDDLE: ~
+thermostatAlgorithm_PID: ~
+thermostatOutputValue_help: ~
+thermostatSubfunction_COOL: ~
+thermostatSubfunction_HEAT: ~
+thermostatTemperature_aboveAlarm: ~
+thermostatTemperature_auxHisteresis: ~
+thermostatTemperature_auxMaxSetpoint: ~
+thermostatTemperature_auxMinSetpoint: ~
+thermostatTemperature_belowAlarm: ~
+thermostatTemperature_boost: ~
+thermostatTemperature_comfort: ~
+thermostatTemperature_eco: ~
+thermostatTemperature_freezeProtection: ~
+thermostatTemperature_heatProtection: ~
+thermostatTemperature_histeresis: ~
+this month: ~
+this year: ~
+tiltControlType_CHANGES_POSITION_WHILE_TILTING: ~
+tiltControlType_STANDS_IN_POSITION_WHILE_TILTING: ~
+tiltControlType_TILTS_ONLY_WHEN_FULLY_CLOSED: ~
+tiltControlType_UNKNOWN: ~
+timeMarginMode_custom: ~
+timeMarginMode_device: ~
+timeMarginMode_off: ~
+today: ~
+unknown: ~
+usedCTType_100A_33mA: ~
+usedCTType_200A_66mA: ~
+usedCTType_400A_133mA: ~
+usedPhaseLedType_OFF: ~
+usedPhaseLedType_POWER_ACTIVE_DIRECTION: ~
+usedPhaseLedType_VOLTAGE_LEVEL: ~
+usedPhaseLedType_VOLTAGE_PRESENCE: ~
+usedPhaseLedType_VOLTAGE_PRESENCE_INVERTED: ~
+values as seen on chart: ~
+values as seen on counter: ~
+valveOpenConfirm_flooding: ~
+valveOpenConfirm_motorProblem: ~
+virtualChannelTypeInfoLong_ENERGY_PRICE_FORECAST: ~
+virtualChannelTypeInfoLong_OPEN_WEATHER: ~
+virtualChannelTypeName_ENERGY_PRICE_FORECAST: ~
+virtualChannelTypeName_OPEN_WEATHER: ~
+yesterday: ~
+'{count} minutes after sunrise': ~
+'{count} minutes after sunset': ~
+'{count} minutes before sunrise': ~
+'{count} minutes before sunset': ~
+'{days} days': ~
+'{serviceName} integration': ~
+
+#</editor-fold>
