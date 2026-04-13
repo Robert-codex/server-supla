@@ -11,6 +11,24 @@ services:
       - ${VOLUME_DATA}/cloud-local:/var/www/cloud/var/local
       - ${VOLUME_DATA}/cloud-logs:/var/www/cloud/var/logs
       - supla-server-socket:/supla-server
+      - ./overlay-admin/app/config/routing.yml:/var/www/cloud/app/config/routing.yml:ro
+      - ./overlay-admin/app/config/security.yml:/var/www/cloud/app/config/security.yml:ro
+      - ./overlay-admin/app/config/services/services.yml:/var/www/cloud/app/config/services/services.yml:ro
+      - ./overlay-admin/src/SuplaBundle/Controller/AdminAuthController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminAuthController.php:ro
+      - ./overlay-admin/src/SuplaBundle/Controller/AdminAccountController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminAccountController.php:ro
+      - ./overlay-admin/src/SuplaBundle/Controller/AdminUsersController.php:/var/www/cloud/src/SuplaBundle/Controller/AdminUsersController.php:ro
+      - ./overlay-admin/src/SuplaBundle/Controller/AdminUiTrait.php:/var/www/cloud/src/SuplaBundle/Controller/AdminUiTrait.php:ro
+      - ./overlay-admin/src/SuplaBundle/Controller/DefaultController.php:/var/www/cloud/src/SuplaBundle/Controller/DefaultController.php:ro
+      - ./overlay-admin/src/SuplaBundle/EventListener/AdminPanelAuthAuditListener.php:/var/www/cloud/src/SuplaBundle/EventListener/AdminPanelAuthAuditListener.php:ro
+      - ./overlay-admin/src/SuplaBundle/EventListener/AdminPanelBruteForceListener.php:/var/www/cloud/src/SuplaBundle/EventListener/AdminPanelBruteForceListener.php:ro
+      - ./overlay-admin/src/SuplaBundle/EventListener/AdminPanelTwoFactorEnforcer.php:/var/www/cloud/src/SuplaBundle/EventListener/AdminPanelTwoFactorEnforcer.php:ro
+      - ./overlay-admin/src/SuplaBundle/EventListener/BlockedUserRequestListener.php:/var/www/cloud/src/SuplaBundle/EventListener/BlockedUserRequestListener.php:ro
+      - ./overlay-admin/src/SuplaBundle/Security/AdminPanelAccountStore.php:/var/www/cloud/src/SuplaBundle/Security/AdminPanelAccountStore.php:ro
+      - ./overlay-admin/src/SuplaBundle/Security/AdminPanelTotp.php:/var/www/cloud/src/SuplaBundle/Security/AdminPanelTotp.php:ro
+      - ./overlay-admin/src/SuplaBundle/Security/AdminPanelUser.php:/var/www/cloud/src/SuplaBundle/Security/AdminPanelUser.php:ro
+      - ./overlay-admin/src/SuplaBundle/Security/AdminPanelUserProvider.php:/var/www/cloud/src/SuplaBundle/Security/AdminPanelUserProvider.php:ro
+      - ./overlay-admin/src/SuplaBundle/Security/RegistrationBlockStore.php:/var/www/cloud/src/SuplaBundle/Security/RegistrationBlockStore.php:ro
+      - ./overlay-admin/src/SuplaBundle/Command/Cyclic/EnergyPriceForecastFetchCommand.php:/var/www/cloud/src/SuplaBundle/Command/Cyclic/EnergyPriceForecastFetchCommand.php:ro
     logging:
       driver: "json-file"
       options:

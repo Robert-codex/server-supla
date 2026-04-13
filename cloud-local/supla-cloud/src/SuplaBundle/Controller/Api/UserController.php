@@ -50,6 +50,7 @@ use SuplaBundle\Model\TimeProvider;
 use SuplaBundle\Model\Transactional;
 use SuplaBundle\Model\UserManager;
 use SuplaBundle\Repository\AuditEntryRepository;
+use SuplaBundle\Security\RegistrationBlockStore;
 use SuplaBundle\Supla\SuplaAutodiscover;
 use SuplaBundle\Supla\SuplaServerAware;
 use SuplaBundle\Utils\PasswordStrengthValidator;
@@ -139,6 +140,8 @@ class UserController extends RestController {
     private $availableLanguages;
     /** * @var bool */
     private $accountsRegistrationEnabled;
+    /** @var RegistrationBlockStore */
+    private $registrationBlockStore;
     /** @var bool */
     private $accountLimitsEditingEnabled;
     /** @var bool */
@@ -184,6 +187,7 @@ class UserController extends RestController {
         ?string $recaptchaSecret,
         array $availableLanguages,
         bool $accountsRegistrationEnabled,
+        RegistrationBlockStore $registrationBlockStore,
         bool $accountLimitsEditingEnabled,
         bool $mqttBrokerEnabled,
         bool $mqttAuthEnabled,
@@ -203,6 +207,7 @@ class UserController extends RestController {
         $this->recaptchaSecret = $recaptchaSecret;
         $this->availableLanguages = $availableLanguages;
         $this->accountsRegistrationEnabled = $accountsRegistrationEnabled;
+        $this->registrationBlockStore = $registrationBlockStore;
         $this->accountLimitsEditingEnabled = $accountLimitsEditingEnabled;
         $this->mqttBrokerEnabled = $mqttBrokerEnabled;
         $this->mqttAuthEnabled = $mqttAuthEnabled;
@@ -440,9 +445,9 @@ class UserController extends RestController {
      * @UnavailableInMaintenance
      */
     public function accountCreateAction(Request $request) {
-        if (!$this->accountsRegistrationEnabled) {
+        if (!$this->accountsRegistrationEnabled || $this->registrationBlockStore->isBlocked()) {
             return $this->view(
-                ['status' => Response::HTTP_LOCKED, 'message' => 'Account registration is diabled'],
+                ['status' => Response::HTTP_LOCKED, 'message' => $this->registrationBlockStore->getBlockedMessage()],
                 Response::HTTP_LOCKED
             );
         }

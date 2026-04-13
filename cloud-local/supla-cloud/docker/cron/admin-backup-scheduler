@@ -1,0 +1,1 @@
+* * * * * root cd /var/www/cloud && /usr/bin/php bin/console supla:admin:run-scheduled-backups --no-interaction >> /var/www/cloud/var/admin_backup_scheduler.log 2>&1
