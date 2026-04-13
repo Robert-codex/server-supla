@@ -5,7 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 dist_dir="${repo_root}/cloud-local/supla-cloud/web/dist"
 web_dir="${repo_root}/cloud-local/supla-cloud/web"
 
-edgefix_version="30"
+edgefix_version="31"
 edgefix_cache_tag="edgefix-v${edgefix_version}"
 cloud_version_label="regnal-codex 01.04.26"
 
@@ -57,10 +57,10 @@ path = Path(sys.argv[1])
 data = path.read_text(encoding="utf-8")
 data = data.replace(
     'import "./two-factor-authentication-DQochOGS-edgefix.js";',
-    'import "./two-factor-authentication-DQochOGS-edgefix.js?v=edgefix-v30";',
+    'import "./two-factor-authentication-DQochOGS-edgefix.js?v=edgefix-v31";',
 ).replace(
     'export { default } from "./two-factor-authentication-DQochOGS-edgefix.js";',
-    'export { default } from "./two-factor-authentication-DQochOGS-edgefix.js?v=edgefix-v30";',
+    'export { default } from "./two-factor-authentication-DQochOGS-edgefix.js?v=edgefix-v31";',
 )
 path.write_text(data, encoding="utf-8")
 PY
@@ -201,10 +201,10 @@ from pathlib import Path
 
 path = Path(sys.argv[1])
 data = path.read_text(encoding="utf-8")
-if '/dist/qrcode-local.js?v=edgefix-v30' not in data:
+if '/dist/qrcode-local.js?v=edgefix-v31' not in data:
     data = data.replace(
-        '<script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js?v=edgefix-v30"></script>',
-        '<script src="/dist/qrcode-local.js?v=edgefix-v30"></script>\n  <script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js?v=edgefix-v30"></script>',
+    '<script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js?v=edgefix-v31"></script>',
+        '<script src="/dist/qrcode-local.js?v=edgefix-v31"></script>\n  <script type="module" crossorigin src="/dist/index-DfO4cloU-limitsfix-edgefix.js?v=edgefix-v31"></script>',
     )
 path.write_text(data, encoding="utf-8")
 PY

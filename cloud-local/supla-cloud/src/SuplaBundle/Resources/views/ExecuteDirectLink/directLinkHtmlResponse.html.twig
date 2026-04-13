@@ -1,0 +1,8 @@
+{% extends '@web/index.html' %}
+
+{% block beforeVue %}
+    <script>
+        window.directLink = {{ directLink | json_encode | raw }};
+        window.failureReason = {{ failureReason is defined and failureReason is not null ? (failureReason.value | json_encode | raw) : '""' }};
+    </script>
+{% endblock %}
